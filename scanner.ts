@@ -56,6 +56,26 @@ export class Scanner {
                 this.addToken(this.match('=') ? TokenType.GREATER_EQUAL : TokenType.GREATER);
                 break;
 
+            case '/':
+                if (this.match('/')) {
+                    while(this.peek() !== '\n' && !this.isAtEnd()) {
+                        this.advance();
+                    }
+                } else {
+                    this.addToken(TokenType.SLASH);
+                }
+
+            // 跳过空白字符
+            case ' ':
+            case '\r':
+            case '\t':
+                break;
+
+            // 换行时行号加一
+            case '\n':
+                this.line++;
+                break;
+
             default:
                 // 不中断扫描，该方法已经设置了 hasError 为 true，不会去执行代码
                 Lox.error(this.line, 'Unexpected character.')
@@ -75,6 +95,16 @@ export class Scanner {
 
         this.current++;
         return true;
+    }
+
+    // 获取当前字符但不向前推进
+    private peek() {
+        if (this.isAtEnd()) {
+            // return '\0';
+            return '';
+        }
+
+        return this.source.charAt(this.current);
     }
 
     // 用于判断是否遍历完所有字符
