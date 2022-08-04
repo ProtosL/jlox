@@ -25,8 +25,41 @@ export class Scanner {
         return this.tokens;
     }
 
+    private scanToken() {
+        const c = this.advance();
+
+        switch(c) {
+            case '(': this.addToken(TokenType.LEFT_PAREN); break;
+            case ')': this.addToken(TokenType.RIGHT_PAREN); break;
+            case '{': this.addToken(TokenType.LEFT_BRACE); break;
+            case '}': this.addToken(TokenType.RIGHT_BRACE); break;
+            case ',': this.addToken(TokenType.COMMA); break;
+            case '.': this.addToken(TokenType.DOT); break;
+            case '-': this.addToken(TokenType.MINUS); break;
+            case '+': this.addToken(TokenType.PLUS); break;
+            case ';': this.addToken(TokenType.SEMICOLON); break;
+            case '*': this.addToken(TokenType.STAR); break; 
+        }
+
+    }
+
     // 用于判断是否遍历完所有字符
     private isAtEnd() {
         return this.current >= this.source.length;
+    }
+
+    // 获取下一个字符
+    private advance() {
+        return this.source.charAt(this.current++);
+    }
+
+    // 获取当前词位的文本并创建一个标记
+    private addToken(type: TokenType, literal?: object) {
+        if (literal) {
+            const text = this.source.substring(this.start, this.current);
+            this.tokens.push(new Token(type, text, literal, this.line));
+        } else {
+            this.addToken(type, {});
+        }
     }
 }
