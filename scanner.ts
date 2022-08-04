@@ -1,5 +1,6 @@
 import { Token } from './token';
 import { TokenType } from './token-type';
+import { Lox } from './lox';
 
 export class Scanner {
     private readonly source: string; // 源代码
@@ -39,6 +40,11 @@ export class Scanner {
             case '+': this.addToken(TokenType.PLUS); break;
             case ';': this.addToken(TokenType.SEMICOLON); break;
             case '*': this.addToken(TokenType.STAR); break; 
+
+            default:
+                // 不中断扫描，该方法已经设置了 hasError 为 true，不会去执行代码
+                Lox.error(this.line, 'Unexpected character.')
+                break;
         }
 
     }

@@ -1,7 +1,7 @@
 import readline from 'readline';
 import fs from 'fs';
 
-class Lox {
+export class Lox {
     static hasError = false;
     
     public static main(args: string[]) {
