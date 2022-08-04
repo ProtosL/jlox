@@ -27,6 +27,7 @@ export class Scanner {
     }
 
     private scanToken() {
+        // current 指向 c 的下一个字符
         const c = this.advance();
 
         switch(c) {
@@ -41,6 +42,20 @@ export class Scanner {
             case ';': this.addToken(TokenType.SEMICOLON); break;
             case '*': this.addToken(TokenType.STAR); break; 
 
+            // ! 后面可能跟着 = ，即 != ，这种时候要作为一个整体
+            case '!':
+                this.addToken(this.match('=') ? TokenType.BANG_EQUAL : TokenType.BANG);
+                break;
+            case '=':
+                this.addToken(this.match('=') ? TokenType.EQUAL_EQUAL : TokenType.EQUAL);
+                break;
+            case '<':
+                this.addToken(this.match('=') ? TokenType.LESS_EQUAL : TokenType.LESS);
+                break;
+            case '>':
+                this.addToken(this.match('=') ? TokenType.GREATER_EQUAL : TokenType.GREATER);
+                break;
+
             default:
                 // 不中断扫描，该方法已经设置了 hasError 为 true，不会去执行代码
                 Lox.error(this.line, 'Unexpected character.')
@@ -49,12 +64,25 @@ export class Scanner {
 
     }
 
+    // 判断当前字符是不是所期望的，如果是则向前推进一位
+    private match(expected: string) {
+        if (this.isAtEnd()) {
+            return false;
+        }
+        if (this.source.charAt(this.current) != expected) {
+            return false;
+        }
+
+        this.current++;
+        return true;
+    }
+
     // 用于判断是否遍历完所有字符
     private isAtEnd() {
         return this.current >= this.source.length;
     }
 
-    // 获取下一个字符
+    // 获取当前字符并向前推进一个字符
     private advance() {
         return this.source.charAt(this.current++);
     }
