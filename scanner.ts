@@ -79,11 +79,32 @@ export class Scanner {
             case '"': this.string(); break;
 
             default:
-                // 不中断扫描，该方法已经设置了 hasError 为 true，不会去执行代码
-                Lox.error(this.line, 'Unexpected character.')
+                if (this.isDigit(c)) {
+                    this.number();
+                } else {
+                    // 不中断扫描，该方法已经设置了 hasError 为 true，不会去执行代码
+                    Lox.error(this.line, 'Unexpected character.')
+                }
                 break;
         }
+    }
 
+    private number() {
+        while(this.isDigit(this.peek())) {
+            this.advance();
+        }
+
+        // 处理小数
+        if (this.peek() === '.' && this.isDigit(this.peekNext())) {
+            // 处理 '.'
+            this.advance();
+
+            while(this.isDigit(this.peek())) {
+                this.advance();
+            }
+        }
+
+        this.addToken(TokenType.NUMBER, this.source.substring(this.start, this.current));
     }
 
     private string() {
@@ -126,6 +147,20 @@ export class Scanner {
         }
 
         return this.source.charAt(this.current);
+    }
+
+    // 获取下一个字符但不向前推进
+    private peekNext() {
+        if (this.current + 1 >= this.source.length) {
+            return '';
+        }
+
+        return this.source.charAt(this.current + 1);
+    }
+
+    // 判断是否为数字
+    private isDigit(c: string) {
+        return c >= '0' && c <= '9';
     }
 
     // 用于判断是否遍历完所有字符
