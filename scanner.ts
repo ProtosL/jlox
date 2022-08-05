@@ -11,6 +11,27 @@ export class Scanner {
     private current = 0;
     private line = 1;
 
+    private static readonly keywords: {
+        [key: string]: TokenType
+    } = {
+            "and": TokenType.AND,
+            "class": TokenType.CLASS,
+            "else": TokenType.ELSE,
+            "false": TokenType.FALSE,
+            "for": TokenType.FOR,
+            "fun": TokenType.FUN,
+            "if": TokenType.IF,
+            "nil": TokenType.NIL,
+            "or": TokenType.OR,
+            "print": TokenType.PRINT,
+            "return": TokenType.RETURN,
+            "super": TokenType.SUPER,
+            "this": TokenType.THIS,
+            "true": TokenType.TRUE,
+            "var": TokenType.VAR,
+            "while": TokenType.WHILE,
+        }
+
     constructor(source: string) {
         this.source = source;
     }
@@ -81,12 +102,25 @@ export class Scanner {
             default:
                 if (this.isDigit(c)) {
                     this.number();
+                } else if (this.isAlpha(c)) { // 假设只要是字母或下划线开头的都是关键字
+                    this.identifier();
                 } else {
                     // 不中断扫描，该方法已经设置了 hasError 为 true，不会去执行代码
                     Lox.error(this.line, 'Unexpected character.')
                 }
                 break;
         }
+    }
+
+    private identifier() {
+        while(this.isAlphaNumeric(this.peek())) {
+            this.advance();
+        }
+
+        const text = this.source.substring(this.start, this.current);
+        const type = Scanner.keywords[text];
+
+        this.addToken(TokenType.IDENTIFIER);
     }
 
     private number() {
@@ -126,7 +160,9 @@ export class Scanner {
         this.addToken(TokenType.STRING, value);
     }
 
-    // 判断当前字符是不是所期望的，如果是则向前推进一位
+    /**
+     * 判断当前字符是不是所期望的，如果是则向前推进一位
+     */
     private match(expected: string) {
         if (this.isAtEnd()) {
             return false;
@@ -139,7 +175,9 @@ export class Scanner {
         return true;
     }
 
-    // 获取当前字符但不向前推进
+    /**
+     * 获取当前字符但不向前推进
+     */
     private peek() {
         if (this.isAtEnd()) {
             // return '\0';
@@ -149,7 +187,9 @@ export class Scanner {
         return this.source.charAt(this.current);
     }
 
-    // 获取下一个字符但不向前推进
+    /**
+     * 获取下一个字符但不向前推进
+     */
     private peekNext() {
         if (this.current + 1 >= this.source.length) {
             return '';
@@ -158,22 +198,44 @@ export class Scanner {
         return this.source.charAt(this.current + 1);
     }
 
-    // 判断是否为数字
+    /**
+     * 判断是否为字符或下划线
+     */
+    private isAlpha(c: string) {
+        return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c === '_';
+    }
+
+    /**
+     * 判断是否为字符、数字或下划线
+     */
+    private isAlphaNumeric(c: string) {
+        return this.isAlpha(c) || this.isDigit(c);
+    }
+
+    /**
+     * 判断是否为数字
+     */
     private isDigit(c: string) {
         return c >= '0' && c <= '9';
     }
 
-    // 用于判断是否遍历完所有字符
+    /**
+     * 用于判断是否遍历完所有字符
+     */ 
     private isAtEnd() {
         return this.current >= this.source.length;
     }
 
-    // 获取当前字符并向前推进一个字符
+    /**
+     * 获取当前字符并向前推进一个字符
+     */
     private advance() {
         return this.source.charAt(this.current++);
     }
 
-    // 获取当前词位的文本并创建一个标记
+    /**
+     * 获取当前词位的文本并创建一个标记
+     */
     private addToken(type: TokenType, literal?: Object) {
         if (literal) {
             const text = this.source.substring(this.start, this.current);
