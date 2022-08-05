@@ -76,12 +76,33 @@ export class Scanner {
                 this.line++;
                 break;
 
+            case '"': this.string(); break;
+
             default:
                 // 不中断扫描，该方法已经设置了 hasError 为 true，不会去执行代码
                 Lox.error(this.line, 'Unexpected character.')
                 break;
         }
 
+    }
+
+    private string() {
+        while(this.peek() !== '"' && !this.isAtEnd()) {
+            if (this.peek() == '\n') {
+                this.line++;
+            }
+            this.advance();
+        }
+
+        if (this.isAtEnd()) {
+            Lox.error(this.line, 'Unterminated string.')
+            return ;
+        }
+
+        this.advance();
+
+        const value = this.source.substring(this.start + 1, this.current - 1);
+        this.addToken(TokenType.STRING, value);
     }
 
     // 判断当前字符是不是所期望的，如果是则向前推进一位
@@ -118,12 +139,12 @@ export class Scanner {
     }
 
     // 获取当前词位的文本并创建一个标记
-    private addToken(type: TokenType, literal?: object) {
+    private addToken(type: TokenType, literal?: Object) {
         if (literal) {
             const text = this.source.substring(this.start, this.current);
             this.tokens.push(new Token(type, text, literal, this.line));
         } else {
-            this.addToken(type, {});
+            this.addToken(type, undefined);
         }
     }
 }
