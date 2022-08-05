@@ -39,7 +39,7 @@ export class Scanner {
     scanTokens() {
         while(!this.isAtEnd()) {
             this.start = this.current;
-            this.scanTokens();
+            this.scanToken();
         }
 
         // 扫描完再末尾加一个 EOF 标记
@@ -85,6 +85,7 @@ export class Scanner {
                 } else {
                     this.addToken(TokenType.SLASH);
                 }
+                break;
 
             // 跳过空白字符
             case ' ':
@@ -138,7 +139,7 @@ export class Scanner {
             }
         }
 
-        this.addToken(TokenType.NUMBER, this.source.substring(this.start, this.current));
+        this.addToken(TokenType.NUMBER, Number(this.source.substring(this.start, this.current)));
     }
 
     private string() {
@@ -241,7 +242,7 @@ export class Scanner {
             const text = this.source.substring(this.start, this.current);
             this.tokens.push(new Token(type, text, literal, this.line));
         } else {
-            this.addToken(type, undefined);
+            this.addToken(type, {});
         }
     }
 }

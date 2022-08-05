@@ -1,5 +1,6 @@
 import readline from 'readline';
 import fs from 'fs';
+import { Scanner } from './scanner';
 
 export class Lox {
     static hasError = false;
@@ -43,13 +44,12 @@ export class Lox {
     }
 
     private static run(source: string) {
-        console.log(source)
-        // const scanner = new Scanner(source);
-        // const tokens = scanner.scanner.scanTokens();
+        const scanner = new Scanner(source);
+        const tokens = scanner.scanTokens();
 
-        // tokens.forEach(token => {
-        //     console.log(token);
-        // })
+        tokens.forEach(token => {
+            console.log(token);
+        })
     }
 
     static error(line: number, message: string) {
