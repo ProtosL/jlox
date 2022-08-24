@@ -22,24 +22,43 @@ class GenerateAst {
         const hierarchyNum = outputDir.startsWith('./') ? slashNum - 1 : slashNum;
         const pathPrefix = hierarchyNum ? new Array(hierarchyNum).fill('../').join('') : './';
         
-        const data = `
-import { Token } from '${pathPrefix}token';
+        fs.writeFileSync(path, `import { Token } from '${pathPrefix}token';`, { flag: 'a' });
+        fs.appendFileSync(path, '\n');
 
-abstract class ${baseName} {
+        this.defineVisitor(path, baseName, types);
+        fs.appendFileSync(path, '\n');
 
-}`
-        fs.writeFileSync(path, data, { flag: 'a' })
+        fs.appendFileSync(path, `
+export abstract class ${baseName} {
+    abstract accept<R>(visitor: Visitor<R>): R;
+}`)
 
         types.forEach(t => {
             const className = t.split('|')[0].trim();
             const fields = t.split('|')[1].trim();
             this.defineType(path, baseName, className, fields);
         })
+
+        fs.appendFileSync(path, '\n');
+    }
+
+    private static defineVisitor(path: string, baseName: string, types: string[]) {
+        fs.appendFileSync(path, `
+export interface Visitor<R> {`)
+
+        types.forEach(type => {
+            const typeName = type.split('|')[0].trim();
+            fs.appendFileSync(path, `
+    visit${typeName}${baseName}(${baseName.toLowerCase()}: ${typeName}): R;`)
+        })
+
+        fs.appendFileSync(path, `
+}`)
     }
 
     private static defineType(path: string, baseName: string, className: string, fieldList: string) {
         fs.appendFileSync(path, `\n
-class ${className} extends ${baseName} {`)
+export class ${className} extends ${baseName} {`)
 
         const fields = fieldList.split(', ');
         fields.forEach(f => {
@@ -59,10 +78,14 @@ class ${className} extends ${baseName} {`)
         this.${name} = ${name};`)
         })
 
-        fs.appendFileSync(path, `
-    }
-}`)
+        fs.appendFileSync(path, `\n`)
+        fs.appendFileSync(path, `    }\n\n`)
+
+        fs.appendFileSync(path, `    accept<R>(visitor: Visitor<R>): R {\n`);
+        fs.appendFileSync(path, `        return visitor.visit${className}${baseName}(this);\n`);
+        fs.appendFileSync(path, "    }\n");
+        fs.appendFileSync(path, `}`)
     }
 }
 
-GenerateAst.run('./test')
+GenerateAst.run('./lib')
