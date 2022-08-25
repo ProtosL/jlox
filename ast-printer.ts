@@ -44,11 +44,14 @@ export class AstPrinter implements Visitor<string> {
     public static run() {
         const expression = new Binary(
             new Unary(
-            new Token(TokenType.MINUS, "-", "{}", 1),
-            new Literal(123)),
+                new Token(TokenType.MINUS, "-", "{}", 1),
+                new Literal(123)
+            ),
             new Token(TokenType.STAR, "*", "{}", 1),
             new Grouping(
-            new Literal(45.67)));
+                new Literal(45.67)
+            )
+        );
 
         console.log(new AstPrinter().print(expression));
     }
