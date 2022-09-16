@@ -57,4 +57,4 @@ export class AstPrinter implements Visitor<string> {
     }
 }
 
-AstPrinter.run(); // (* (- 123) (group 45.67))
+// AstPrinter.run(); // (* (- 123) (group 45.67))
