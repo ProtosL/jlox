@@ -242,7 +242,7 @@ export class Scanner {
      * 获取当前词位的文本并创建一个标记
      */
     private addToken(type: TokenType, literal?: Nullable<Object>) {
-        if (literal === null || literal) {
+        if (literal === null || literal !== undefined) {
             const text = this.source.substring(this.start, this.current);
             this.tokens.push(new Token(type, text, literal, this.line));
         } else {

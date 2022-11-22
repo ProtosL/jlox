@@ -59,6 +59,9 @@ export class Interpreter implements Visitor<Nullable<Object>> {
                 throw new RuntimeError(expr.operator, 'Operands must be two numbers or two strings.');
             case TokenType.SLASH:
                 this.checkNumberOperands(expr.operator, left, right);
+                if (right === 0) {
+                    throw new RuntimeError(expr.operator, 'Right operand must not be zero.');
+                }
                 return Number(left) / Number(right);
             case TokenType.STAR:
                 this.checkNumberOperands(expr.operator, left, right);
