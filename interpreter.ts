@@ -52,6 +52,10 @@ export class Interpreter implements Visitor<Nullable<Object>> {
                 if (typeof left === 'string' && typeof right === 'string') {
                     return String(left) + String(right);
                 }
+
+                if (typeof left === 'string' && typeof right === 'number') {
+                    return String(left) + String(right);
+                }
                 throw new RuntimeError(expr.operator, 'Operands must be two numbers or two strings.');
             case TokenType.SLASH:
                 this.checkNumberOperands(expr.operator, left, right);
