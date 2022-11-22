@@ -1,12 +1,13 @@
 import { TokenType } from "./token-type";
+import { Nullable } from "./type.d";
 
 export class Token {
     readonly type: TokenType;
     readonly lexeme: string;
-    readonly literal: object;
+    readonly literal: Nullable<Object>;
     readonly line: number;
 
-    constructor(type: TokenType, lexeme: string, literal: Object, line: number) {
+    constructor(type: TokenType, lexeme: string, literal: Nullable<Object>, line: number) {
         this.type = type;
         this.lexeme = lexeme;
         this.literal = literal;

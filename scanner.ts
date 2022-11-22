@@ -1,6 +1,7 @@
 import { Token } from './token';
 import { TokenType } from './token-type';
 import { Lox } from './lox';
+import { Nullable } from './type.d';
 
 export class Scanner {
     private readonly source: string; // 源代码
@@ -43,7 +44,7 @@ export class Scanner {
         }
 
         // 扫描完再末尾加一个 EOF 标记
-        this.tokens.push(new Token(TokenType.EOF, '', {}, this.line))
+        this.tokens.push(new Token(TokenType.EOF, '', null, this.line))
         return this.tokens;
     }
 
@@ -119,9 +120,12 @@ export class Scanner {
         }
 
         const text = this.source.substring(this.start, this.current);
-        const type = Scanner.keywords[text];
+        let type = Scanner.keywords[text];
 
-        this.addToken(TokenType.IDENTIFIER);
+        if (!type) {
+            type = TokenType.IDENTIFIER;
+        }
+        this.addToken(type);
     }
 
     private number() {
@@ -237,12 +241,12 @@ export class Scanner {
     /**
      * 获取当前词位的文本并创建一个标记
      */
-    private addToken(type: TokenType, literal?: Object) {
-        if (literal) {
+    private addToken(type: TokenType, literal?: Nullable<Object>) {
+        if (literal === null || literal) {
             const text = this.source.substring(this.start, this.current);
             this.tokens.push(new Token(type, text, literal, this.line));
         } else {
-            this.addToken(type, {});
+            this.addToken(type, null);
         }
     }
 }

@@ -15,6 +15,7 @@ operator       → "==" | "!=" | "<" | "<=" | ">" | ">="
 */
 
 import { Token } from '../token';
+import { Nullable } from '../type.d';
 
 export interface Visitor<R> {
     visitBinaryExpr(expr: Binary): R;
@@ -58,9 +59,9 @@ export class Grouping extends Expr {
 }
 
 export class Literal extends Expr {
-    readonly value: Object;
+    readonly value: Nullable<Object>;
 
-    constructor(value: Object) {
+    constructor(value: Nullable<Object>) {
         super();
         this.value = value;
     }

@@ -5,10 +5,12 @@ import { TokenType } from './token-type';
 import { Token } from './token';
 import { Parser } from './parser';
 import { AstPrinter } from './ast-printer';
-import { Expr } from './lib/expr';
+import { Interpreter } from './interpreter';
 
 export class Lox {
+    private static readonly interpreter = new Interpreter();
     static hasError = false;
+    static hasRuntimeError = false;
     
     public static main(args: string[]) {
         if (args.length > 1) {
@@ -26,7 +28,10 @@ export class Lox {
         this.run(data);
 
         if (this.hasError) {
-            process.exit(1);
+            process.exit(65);
+        }
+        if (this.hasRuntimeError) {
+            process.exit(70);
         }
     }
 
@@ -58,6 +63,7 @@ export class Lox {
             return;
         }
 
+        this.interpreter.interpret(expression);
         console.log(new AstPrinter().print(expression));
 
         // tokens.forEach(token => {
@@ -73,6 +79,11 @@ export class Lox {
         }
     }
 
+    static runtimeError(error: any) {
+        console.log(error.message + "\n[line " + error.token.line + "]");
+        this.hasRuntimeError = true;
+    }
+
     private static report(line: number, where: string, message: string) {
         console.error("[line " + line + "] Error" + where + ": " + message);
         this.hasError = true;
@@ -86,4 +97,4 @@ export class Lox {
         }
     }
 }
-Lox.main([`./test.ts`]);
+Lox.main([`./test/test.ts`]);

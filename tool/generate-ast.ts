@@ -5,7 +5,7 @@ class GenerateAst {
         this.defineAst(outputDir, "Expr", [
             "Binary   | left: Expr, operator: Token, right: Expr",
             "Grouping | expression: Expr",
-            "Literal  | value: Object",
+            "Literal  | value: Nullable<Object>",
             "Unary    | operator: Token, right: Expr"
         ])
     }

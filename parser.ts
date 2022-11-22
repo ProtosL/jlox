@@ -111,7 +111,7 @@ export class Parser {
             return new Literal(true);
         }
         if (this.match(TokenType.NIL)) {
-            return new Literal({});
+            return new Literal(null);
         }
 
         if (this.match(TokenType.NUMBER, TokenType.STRING)) {
