@@ -1,3 +1,6 @@
+/**
+ * 只是简单的生成基础内容，由于是采用的文本追加的形式，使用时需注释掉 run 中不需要的部分
+ */
 import fs from 'fs';
 
 class GenerateAst {
@@ -7,6 +10,11 @@ class GenerateAst {
             "Grouping | expression: Expr",
             "Literal  | value: Nullable<Object>",
             "Unary    | operator: Token, right: Expr"
+        ])
+
+        this.defineAst(outputDir, "Stmt", [
+            "Expression | expression: Expr",
+            "Print      | expression: Expr"
         ])
     }
 
