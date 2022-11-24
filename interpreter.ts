@@ -4,8 +4,9 @@ import { Token } from "./token";
 import { TokenType } from "./token-type";
 import { Lox } from './lox';
 import { Nullable } from "./type.d";
+import { Stmt } from "./lib/stmt";
 
-export class Interpreter implements Expr.Visitor<Nullable<Object>> {
+export class Interpreter implements Expr.Visitor<Nullable<Object>>, Stmt.Visitor<void> {
     public visitLiteralExpr(expr: Expr.Literal): Nullable<Object> {
         return expr.value;
     }
@@ -88,6 +89,17 @@ export class Interpreter implements Expr.Visitor<Nullable<Object>> {
         return null;
     }
 
+    public visitExpressionStmt(stmt: Stmt.Expression): void {
+        this.evaluate(stmt.expression);
+        return ;
+    }
+
+    public visitPrintStmt(stmt: Stmt.Print): void {
+        const value = this.evaluate(stmt.expression);
+        console.log(this.stringify(value));
+        return ;
+    }
+
     private checkNumberOperands(operator: Token, left: Nullable<Object>, right: Nullable<Object>) {
         if (typeof left === 'number' && typeof right === 'number') {
             return ;
@@ -118,20 +130,30 @@ export class Interpreter implements Expr.Visitor<Nullable<Object>> {
         return true;
     }
 
-    // 获取值
+    /**
+     * 获取值
+     * */
     private evaluate(expr: Expr.Expr): Nullable<Object> {
         return expr.accept(this);
     }
 
-    interpret(expression: Expr.Expr) {
+    private execute(stmt: Stmt.Stmt) {
+        stmt.accept(this);
+    }
+
+    interpret(statements: Stmt.Stmt[]) {
         try {
-            const value = this.evaluate(expression);
-            console.log(this.stringify(value))
+            statements.forEach(statement => {
+                this.execute(statement);
+            })
         } catch (error) {
             Lox.runtimeError(error);
         }
     }
 
+    /**
+     * 转换为字符串
+     */
     private stringify(object: Nullable<Object>): string {
         if (object === null) {
             return 'nil'

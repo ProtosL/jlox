@@ -1,5 +1,6 @@
 import { Token } from './token';
 import { Expr } from './lib/expr';
+import { Stmt } from './lib/stmt';
 import { TokenType } from './token-type';
 import { Lox } from './lox';
 
@@ -13,16 +14,42 @@ export class Parser {
         this.tokens = tokens;
     }
 
-    parse(): Expr.Expr| null {
-        try {
-            return this.expression();
-        } catch (e) {
-            return null;
+    parse(): Stmt.Stmt[] {
+        const statements: Stmt.Stmt[] = [];
+        while(!this.isAtEnd()) {
+            statements.push(this.statement());
         }
+
+        return statements;
+        // try {
+        //     return this.expression();
+        // } catch (e) {
+        //     return null;
+        // }
     }
 
     private expression(): Expr.Expr {
         return this.equality();
+    }
+
+    private statement(): Stmt.Stmt {
+        if (this.match(TokenType.PRINT)) {
+            return this.printStatement();
+        }
+
+        return this.expressionStatement();
+    }
+
+    private printStatement() {
+        const value: Expr.Expr = this.expression();
+        this.consume(TokenType.SEMICOLON, "Expect ';' after value.");
+        return new Stmt.Print(value);
+    }
+
+    private expressionStatement() {
+        const expr: Expr.Expr = this.expression();
+        this.consume(TokenType.SEMICOLON, "Expect ';' after expression.");
+        return new Stmt.Expression(expr);
     }
 
     /**

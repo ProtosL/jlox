@@ -1,4 +1,8 @@
-3/0
+// print "asdf";
+// print "test ; error"
+// print true;
+print (3 + 1);
+// 3/0
 // 0 + 1
 // !3
 // 5 > a4a

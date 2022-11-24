@@ -57,18 +57,13 @@ export class Lox {
         const scanner = new Scanner(source);
         const tokens = scanner.scanTokens();
         const parser = new Parser(tokens);
-        const expression = parser.parse();
+        const statements = parser.parse();
 
-        if (this.hasError || !expression) {
+        if (this.hasError) {
             return;
         }
 
-        this.interpreter.interpret(expression);
-        console.log(new AstPrinter().print(expression));
-
-        // tokens.forEach(token => {
-        //     console.log(token);
-        // })
+        this.interpreter.interpret(statements);
     }
 
     static error(line: number | Token, message: string) {
