@@ -1,32 +1,32 @@
-import { Expr, Visitor, Grouping, Literal, Unary, Binary } from "./lib/expr";
+import { Expr } from "./lib/expr";
 import { Token } from "./token";
 import { TokenType } from "./token-type";
 
-export class AstPrinter implements Visitor<string> {
+export class AstPrinter implements Expr.Visitor<string> {
 
-    print(expr: Expr): string {
+    print(expr: Expr.Expr): string {
         return expr.accept(this);
     }
 
-    public visitBinaryExpr(expr: Binary): string {
+    public visitBinaryExpr(expr: Expr.Binary): string {
         return this.parenthesize(expr.operator.lexeme,
             expr.left, expr.right);
     }
 
-    public visitGroupingExpr(expr: Grouping): string {
+    public visitGroupingExpr(expr: Expr.Grouping): string {
         return this.parenthesize("group", expr.expression);
     }
 
-    public visitLiteralExpr(expr: Literal): string {
+    public visitLiteralExpr(expr: Expr.Literal): string {
         if (expr.value == null) return "nil";
         return expr.value.toString();
     }
 
-    public visitUnaryExpr(expr: Unary): string {
+    public visitUnaryExpr(expr: Expr.Unary): string {
         return this.parenthesize(expr.operator.lexeme, expr.right);
     }
 
-    private parenthesize(name: string, ...exprs: Expr[]) {
+    private parenthesize(name: string, ...exprs: Expr.Expr[]) {
         let str = '';
         str += `(${name}`;
 
@@ -42,14 +42,14 @@ export class AstPrinter implements Visitor<string> {
 
     // 测试
     public static run() {
-        const expression = new Binary(
-            new Unary(
+        const expression = new Expr.Binary(
+            new Expr.Unary(
                 new Token(TokenType.MINUS, "-", "{}", 1),
-                new Literal(123)
+                new Expr.Literal(123)
             ),
             new Token(TokenType.STAR, "*", "{}", 1),
-            new Grouping(
-                new Literal(45.67)
+            new Expr.Grouping(
+                new Expr.Literal(45.67)
             )
         );
 

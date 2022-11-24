@@ -1,5 +1,5 @@
 import { Token } from './token';
-import { Expr, Binary, Unary, Literal, Grouping } from './lib/expr';
+import { Expr } from './lib/expr';
 import { TokenType } from './token-type';
 import { Lox } from './lox';
 
@@ -13,7 +13,7 @@ export class Parser {
         this.tokens = tokens;
     }
 
-    parse(): Expr| null {
+    parse(): Expr.Expr| null {
         try {
             return this.expression();
         } catch (e) {
@@ -21,20 +21,20 @@ export class Parser {
         }
     }
 
-    private expression(): Expr {
+    private expression(): Expr.Expr {
         return this.equality();
     }
 
     /**
      * equality       → comparison ( ( "!=" | "==" ) comparison )* ;
      */
-    private equality(): Expr {
-        let expr: Expr = this.comparison();
+    private equality(): Expr.Expr {
+        let expr: Expr.Expr = this.comparison();
 
         while(this.match(TokenType.BANG_EQUAL, TokenType.EQUAL_EQUAL)) {
             const operator: Token = this.previous();
-            const right: Expr = this.comparison();
-            expr = new Binary(expr, operator, right);
+            const right: Expr.Expr = this.comparison();
+            expr = new Expr.Binary(expr, operator, right);
         }
 
         return expr;
@@ -43,13 +43,13 @@ export class Parser {
     /**
      * comparison     → term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
      */
-    private comparison(): Expr {
+    private comparison(): Expr.Expr {
         let expr = this.term();
 
         while(this.match(TokenType.GREATER, TokenType.GREATER_EQUAL, TokenType.LESS, TokenType.LESS_EQUAL)) {
             const operator: Token = this.previous();
-            const right: Expr = this.term();
-            expr = new Binary(expr, operator, right);
+            const right: Expr.Expr = this.term();
+            expr = new Expr.Binary(expr, operator, right);
         }
 
         return expr;
@@ -58,13 +58,13 @@ export class Parser {
     /**
      * 加法与减法
      */
-    private term(): Expr {
-        let expr: Expr = this.factor();
+    private term(): Expr.Expr {
+        let expr: Expr.Expr = this.factor();
 
         while(this.match(TokenType.MINUS, TokenType.PLUS)) {
             const operator: Token = this.previous();
-            const right: Expr = this.factor();
-            expr = new Binary(expr, operator, right);
+            const right: Expr.Expr = this.factor();
+            expr = new Expr.Binary(expr, operator, right);
         }
 
         return expr;
@@ -73,13 +73,13 @@ export class Parser {
     /**
      * 乘法与除法
      */
-    private factor(): Expr {
+    private factor(): Expr.Expr {
         let expr = this.unary();
 
         while(this.match(TokenType.SLASH, TokenType.STAR)) {
             const operator: Token = this.previous();
-            const right: Expr = this.unary();
-            expr = new Binary(expr, operator, right);
+            const right: Expr.Expr = this.unary();
+            expr = new Expr.Binary(expr, operator, right);
         }
 
         return expr;
@@ -89,11 +89,11 @@ export class Parser {
      * unary          → ( "!" | "-" ) unary
      *                | primary ;
      */
-    private unary(): Expr {
+    private unary(): Expr.Expr {
         if (this.match(TokenType.BANG, TokenType.MINUS)) {
             const operator: Token = this.previous();
             const right = this.unary();
-            return new Unary(operator, right);
+            return new Expr.Unary(operator, right);
         }
 
         return this.primary();
@@ -103,25 +103,25 @@ export class Parser {
      * primary        → NUMBER | STRING | "true" | "false" | "nil"
      *                | "(" expression ")" ;
      */
-    private primary(): Expr {
+    private primary(): Expr.Expr {
         if (this.match(TokenType.FALSE)) {
-            return new Literal(false);
+            return new Expr.Literal(false);
         }
         if (this.match(TokenType.TRUE)) {
-            return new Literal(true);
+            return new Expr.Literal(true);
         }
         if (this.match(TokenType.NIL)) {
-            return new Literal(null);
+            return new Expr.Literal(null);
         }
 
         if (this.match(TokenType.NUMBER, TokenType.STRING)) {
-            return new Literal(this.previous().literal);
+            return new Expr.Literal(this.previous().literal);
         }
 
         if (this.match(TokenType.LEFT_PAREN)) {
             const expr = this.expression();
             this.consume(TokenType.RIGHT_PAREN, `Expect ')' after expression.`)
-            return new Grouping(expr);
+            return new Expr.Grouping(expr);
         }
 
         throw this.error(this.peek(), 'Expect expression.');

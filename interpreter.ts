@@ -1,20 +1,20 @@
-import { Binary, Expr, Grouping, Literal, Unary, Visitor } from "./lib/expr";
+import { Expr } from "./lib/expr";
 import { RuntimeError } from "./runtime-error";
 import { Token } from "./token";
 import { TokenType } from "./token-type";
 import { Lox } from './lox';
 import { Nullable } from "./type.d";
 
-export class Interpreter implements Visitor<Nullable<Object>> {
-    public visitLiteralExpr(expr: Literal): Nullable<Object> {
+export class Interpreter implements Expr.Visitor<Nullable<Object>> {
+    public visitLiteralExpr(expr: Expr.Literal): Nullable<Object> {
         return expr.value;
     }
 
-    public visitGroupingExpr(expr: Grouping): Nullable<Object> {
+    public visitGroupingExpr(expr: Expr.Grouping): Nullable<Object> {
         return this.evaluate(expr.expression);
     }
 
-    public visitUnaryExpr(expr: Unary): Nullable<Object> {
+    public visitUnaryExpr(expr: Expr.Unary): Nullable<Object> {
         const right: Nullable<Object> = this.evaluate(expr.right);
 
         switch(expr.operator.type) {
@@ -37,7 +37,7 @@ export class Interpreter implements Visitor<Nullable<Object>> {
         throw new RuntimeError(operator, 'Operand must be a number');
     }
 
-    public visitBinaryExpr(expr: Binary): Nullable<Object> {
+    public visitBinaryExpr(expr: Expr.Binary): Nullable<Object> {
         const left: Nullable<Object> = this.evaluate(expr.left);
         const right: Nullable<Object> = this.evaluate(expr.right);
 
@@ -119,11 +119,11 @@ export class Interpreter implements Visitor<Nullable<Object>> {
     }
 
     // 获取值
-    private evaluate(expr: Expr): Nullable<Object> {
+    private evaluate(expr: Expr.Expr): Nullable<Object> {
         return expr.accept(this);
     }
 
-    interpret(expression: Expr) {
+    interpret(expression: Expr.Expr) {
         try {
             const value = this.evaluate(expression);
             console.log(this.stringify(value))
