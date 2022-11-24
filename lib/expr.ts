@@ -7,6 +7,7 @@ export namespace Expr {
         visitGroupingExpr(expr: Grouping): R;
         visitLiteralExpr(expr: Literal): R;
         visitUnaryExpr(expr: Unary): R;
+        visitVariableExpr(expr: Variable): R;
     }
 
     export abstract class Expr {
@@ -68,6 +69,19 @@ export namespace Expr {
 
         accept<R>(visitor: Visitor<R>): R {
             return visitor.visitUnaryExpr(this);
+        }
+    }
+
+    export class Variable extends Expr {
+        readonly name: Token;
+
+        constructor(name: Token) {
+            super();
+            this.name = name;
+        }
+
+        accept<R>(visitor: Visitor<R>): R {
+            return visitor.visitVariableExpr(this);
         }
     }
 }
