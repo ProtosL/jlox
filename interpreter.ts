@@ -116,6 +116,12 @@ export class Interpreter implements Expr.Visitor<Nullable<Object>>, Stmt.Visitor
         this.environment.define(stmt.name.lexeme, value);
     }
 
+    public visitAssignExpr(expr: Expr.Assign): Nullable<Object> {
+        const value = this.evaluate(expr.value);
+        this.environment.assign(expr.name, value);
+        return value;
+    }
+
     private checkNumberOperands(operator: Token, left: Nullable<Object>, right: Nullable<Object>) {
         if (typeof left === 'number' && typeof right === 'number') {
             return ;
