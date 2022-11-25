@@ -163,6 +163,22 @@ export class Interpreter implements Expr.Visitor<Nullable<Object>>, Stmt.Visitor
         stmt.accept(this);
     }
 
+    executeBlock(statements: Stmt.Stmt[], environment: Environment) {
+        const previous: Environment = this.environment;
+        try {
+            this.environment = environment;
+            statements.forEach(statement => {
+                this.execute(statement);
+            })
+        } finally {
+            this.environment = previous;
+        }
+    }
+
+    public visitBlockStmt(stmt: Stmt.Block): void {
+        this.executeBlock(stmt.statements, new Environment(this.environment));
+    }
+
     interpret(statements: Stmt.Stmt[]) {
         try {
             statements.forEach(statement => {

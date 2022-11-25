@@ -2,7 +2,7 @@ import { Nullable } from "./type";
 import { Token } from './token';
 
 export class Environment {
-    readonly enclosing: Environment;
+    readonly enclosing: Nullable<Environment> = null;
     private readonly values: Map<string, Nullable<Object>> = new Map();
 
     constructor(enclosing?: Environment) {
@@ -14,12 +14,12 @@ export class Environment {
     /**
      * 获取变量的值，不存在则返回 null
      */
-    get(name: Token) {
+    get(name: Token): Nullable<Object> {
         if (this.values.has(name.lexeme)) {
             return this.values.get(name.lexeme) || null;
         }
 
-        if (this.enclosing !== undefined) {
+        if (this.enclosing !== null) {
             return this.enclosing.get(name);
         }
 
@@ -35,7 +35,7 @@ export class Environment {
             return;
         }
 
-        if (this.enclosing !== undefined) {
+        if (this.enclosing !== null) {
             this.enclosing.assign(name, value);
             return;
         }
