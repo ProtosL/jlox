@@ -2,7 +2,14 @@ import { Nullable } from "./type";
 import { Token } from './token';
 
 export class Environment {
+    readonly enclosing: Environment;
     private readonly values: Map<string, Nullable<Object>> = new Map();
+
+    constructor(enclosing?: Environment) {
+        if (enclosing) {
+            this.enclosing = enclosing;
+        }
+    }
 
     /**
      * 获取变量的值，不存在则返回 null
@@ -10,6 +17,10 @@ export class Environment {
     get(name: Token) {
         if (this.values.has(name.lexeme)) {
             return this.values.get(name.lexeme) || null;
+        }
+
+        if (this.enclosing !== undefined) {
+            return this.enclosing.get(name);
         }
 
         throw new Error(`Undefined variable ${name.lexeme}.`);
@@ -21,6 +32,11 @@ export class Environment {
     assign(name: Token, value: Nullable<Object>) {
         if (this.values.has(name.lexeme)) {
             this.values.set(name.lexeme, value);
+            return;
+        }
+
+        if (this.enclosing !== undefined) {
+            this.enclosing.assign(name, value);
             return;
         }
 
