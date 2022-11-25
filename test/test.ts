@@ -1,7 +1,10 @@
+var a = 123;
+var b = 223;
+print a + b;
 // print "asdf";
 // print "test ; error"
 // print true;
-print (3 + 1);
+// print (3 + 1);
 // 3/0
 // 0 + 1
 // !3

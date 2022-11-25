@@ -5,8 +5,11 @@ import { TokenType } from "./token-type";
 import { Lox } from './lox';
 import { Nullable } from "./type.d";
 import { Stmt } from "./lib/stmt";
+import { Environment } from "./environment";
 
 export class Interpreter implements Expr.Visitor<Nullable<Object>>, Stmt.Visitor<void> {
+    private environment = new Environment();
+    
     public visitLiteralExpr(expr: Expr.Literal): Nullable<Object> {
         return expr.value;
     }
@@ -29,6 +32,10 @@ export class Interpreter implements Expr.Visitor<Nullable<Object>>, Stmt.Visitor
 
         // Unreachable
         return null;
+    }
+
+    public visitVariableExpr(expr: Expr.Variable): Nullable<Object> {
+        return this.environment.get(expr.name);
     }
 
     private checkNumberOperand(operator: Token, operand: Nullable<Object>) {
@@ -98,6 +105,15 @@ export class Interpreter implements Expr.Visitor<Nullable<Object>>, Stmt.Visitor
         const value = this.evaluate(stmt.expression);
         console.log(this.stringify(value));
         return ;
+    }
+
+    public visitVarStmt(stmt: Stmt.Var): void {
+        let value: Nullable<Object> = null;
+        if (stmt.initializer !== null) {
+            value = this.evaluate(stmt.initializer);
+        }
+
+        this.environment.define(stmt.name.lexeme, value);
     }
 
     private checkNumberOperands(operator: Token, left: Nullable<Object>, right: Nullable<Object>) {

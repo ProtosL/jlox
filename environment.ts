@@ -6,7 +6,7 @@ export class Environment {
 
     get(name: Token) {
         if (this.values.has(name.lexeme)) {
-            return this.values.get(name.lexeme);
+            return this.values.get(name.lexeme) || null;
         }
 
         throw new Error(`Undefined variable ${name.lexeme}.`);
