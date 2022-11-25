@@ -3,6 +3,7 @@ import { Nullable } from '../type.d';
 
 export namespace Expr {
     export interface Visitor<R> {
+        visitAssignExpr(expr: Assign): R;
         visitBinaryExpr(expr: Binary): R;
         visitGroupingExpr(expr: Grouping): R;
         visitLiteralExpr(expr: Literal): R;
@@ -12,6 +13,21 @@ export namespace Expr {
 
     export abstract class Expr {
         abstract accept<R>(visitor: Visitor<R>): R;
+    }
+
+    export class Assign extends Expr {
+        readonly name: Token;
+        readonly value: Expr;
+
+        constructor(name: Token, value: Expr) {
+            super();
+            this.name = name;
+            this.value = value;
+        }
+
+        accept<R>(visitor: Visitor<R>): R {
+            return visitor.visitAssignExpr(this);
+        }
     }
 
     export class Binary extends Expr {

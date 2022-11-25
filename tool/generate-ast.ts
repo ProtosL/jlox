@@ -6,6 +6,7 @@ import fs from 'fs';
 class GenerateAst {
     public static run(outputDir: string) {
         this.defineAst(outputDir, "Expr", [
+            "Assign   | name: Token, value: Expr",
             "Binary   | left: Expr, operator: Token, right: Expr",
             "Grouping | expression: Expr",
             "Literal  | value: Nullable<Object>",

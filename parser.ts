@@ -23,8 +23,13 @@ export class Parser {
         return statements;
     }
 
+    /**
+     * expression     → assignment ;
+     * assignment     → IDENTIFIER "=" assignment
+     *                | equality ;
+     */
     private expression(): Expr.Expr {
-        return this.equality();
+        return this.assignment();
     }
 
     /**
@@ -75,6 +80,24 @@ export class Parser {
         const expr: Expr.Expr = this.expression();
         this.consume(TokenType.SEMICOLON, "Expect ';' after expression.");
         return new Stmt.Expression(expr);
+    }
+
+    private assignment(): Expr.Expr {
+        const expr: Expr.Expr = this.equality();
+
+        if (this.match(TokenType.EQUAL)) {
+            const equals: Token = this.previous();
+            const value: Expr.Expr = this.assignment();
+
+            if (expr instanceof Expr.Variable) {
+                const name: Token = expr.name;
+                return new Expr.Assign(name, value);
+            }
+
+            this.error(equals, "Invalid assignment target.");
+        }
+
+        return expr;
     }
 
     /**
