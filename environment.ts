@@ -16,7 +16,7 @@ export class Environment {
      */
     get(name: Token): Nullable<Object> {
         if (this.values.has(name.lexeme)) {
-            return this.values.get(name.lexeme) || null;
+            return this.values.get(name.lexeme) as Object;
         }
 
         if (this.enclosing !== null) {

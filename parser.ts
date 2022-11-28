@@ -54,16 +54,23 @@ export class Parser {
 
     /**
      * statement      → exprStmt
+     *                | forStmt
      *                | ifStmt
      *                | printStmt
      *                | whileStmt
      *                | block ;
      * 
+     * forStmt        → "for" "(" ( varDecl | exprStmt | ";" )
+     *                  expression? ";"
+     * .                expression? ")" statement ;
      * ifStmt         → "if" "(" expression ")" statement
      *                ( "else" statement)? ;
      * block          → "{" declaration* "}" ;
      */
     private statement(): Stmt.Stmt {
+        if (this.match(TokenType.FOR)) {
+            return this.forStatement();
+        }
         if (this.match(TokenType.IF)) {
             return this.ifStatement();
         }
@@ -78,6 +85,63 @@ export class Parser {
         }
 
         return this.expressionStatement();
+    }
+
+    /**
+     * for 语法可以通过 while 来实现
+     * {
+     *   var i = 0;
+     *   while (i < 10) {
+     *     print i;
+     *     i = i + 1;
+     *   }
+     * }
+     * 
+     * forStmt        → "for" "(" ( varDecl | exprStmt | ";" )
+     *                  expression? ";"
+     *                  expression? ")" statement ;
+     */
+    private forStatement() {
+        this.consume(TokenType.LEFT_PAREN, "Expect '(' after 'for'.");
+
+        let initializer: Nullable<Stmt.Stmt>;
+        if (this.match(TokenType.SEMICOLON)) {
+            initializer = null;
+        } else if (this.match(TokenType.VAR)) {
+            initializer = this.varDeclaration();
+        } else {
+            initializer = this.expressionStatement();
+        }
+
+        let condition: Nullable<Expr.Expr> = null;
+        if (!this.check(TokenType.SEMICOLON)) {
+            condition = this.expression();
+        }
+        this.consume(TokenType.SEMICOLON, "Expect ';' after loop condition.");
+
+        let increment: Nullable<Expr.Expr> = null;
+        if (!this.check(TokenType.RIGHT_PAREN)) {
+            increment = this.expression();
+        }
+        this.consume(TokenType.RIGHT_PAREN, "Expect ')' after for clauses.");
+        let body = this.statement();
+
+        if (increment !== null) {
+            // 在每次循环体 body 执行后，执行 increment 语句
+            body = new Stmt.Block([body, new Stmt.Expression(increment)]);
+        }
+
+        if (condition === null) {
+            // 无条件时视为 true
+            condition = new Expr.Literal(true);
+        }
+        body = new Stmt.While(condition, body);
+
+        if (initializer !== null) {
+            body = new Stmt.Block([initializer, body]);
+        }
+        
+        return body;
     }
 
     private ifStatement(): Stmt.Stmt {
