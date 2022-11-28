@@ -319,8 +319,8 @@ export class Parser {
     }
 
     /**
-     * unary          → ( "!" | "-" ) unary
-     *                | primary ;
+     * unary          → ( "!" | "-" ) unary | call ;
+     * call           | primary ( "(" arguments? ")" )* ;
      */
     private unary(): Expr.Expr {
         if (this.match(TokenType.BANG, TokenType.MINUS)) {
@@ -329,7 +329,34 @@ export class Parser {
             return new Expr.Unary(operator, right);
         }
 
-        return this.primary();
+        return this.call();
+    }
+
+    private finishCall(callee: Expr.Expr): Expr.Expr {
+        const argumentList: Expr.Expr[] = [];
+        if (!this.check(TokenType.RIGHT_PAREN)) {
+            do {
+                argumentList.push(this.expression());
+            } while (this.match(TokenType.COMMA));
+        }
+
+        const paren = this.consume(TokenType.RIGHT_PAREN, "Expect ')' after arguments.");
+
+        return new Expr.Call(callee, paren, argumentList);
+    }
+
+    private call(): Expr.Expr {
+        let expr: Expr.Expr = this.primary();
+
+        while(true) {
+            if (this.match(TokenType.LEFT_PAREN)) {
+                expr = this.finishCall(expr);
+            } else {
+                break;
+            }
+        }
+
+        return expr;
     }
 
     /**

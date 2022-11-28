@@ -8,6 +8,7 @@ class GenerateAst {
         this.defineAst(outputDir, "Expr", [
             "Assign   | name: Token, value: Expr",
             "Binary   | left: Expr, operator: Token, right: Expr",
+            "Call     | callee: Expr, paren: Token, arguments: Expr[]",
             "Grouping | expression: Expr",
             "Literal  | value: Nullable<Object>",
             "Logical  | left: Expr, operator: Token, right: Expr",
