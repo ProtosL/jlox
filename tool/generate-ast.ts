@@ -22,7 +22,8 @@ class GenerateAst {
             "Expression | expression: Expr.Expr",
             "If         | condition: Expr.Expr, thenBranch: Stmt, elseBranch: Nullable<Stmt>",
             "Print      | expression: Expr.Expr",
-            "Var        | name: Token, initializer: Expr.Expr"
+            "Var        | name: Token, initializer: Expr.Expr",
+            "While      | condition: Expr.Expr, body: Stmt"
         ], [
             "import { Nullable } from '../type.d';",
             "import { Expr } from './expr';",

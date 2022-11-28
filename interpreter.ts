@@ -143,6 +143,13 @@ export class Interpreter implements Expr.Visitor<Nullable<Object>>, Stmt.Visitor
         this.environment.define(stmt.name.lexeme, value);
     }
 
+    public visitWhileStmt(stmt: Stmt.While): void {
+        while (this.isTruthy(this.evaluate(stmt.condition))) {
+            this.execute(stmt.body);
+        }
+
+    }
+
     public visitAssignExpr(expr: Expr.Assign): Nullable<Object> {
         const value = this.evaluate(expr.value);
         this.environment.assign(expr.name, value);
