@@ -14,6 +14,24 @@ export class Interpreter implements Expr.Visitor<Nullable<Object>>, Stmt.Visitor
         return expr.value;
     }
 
+    public visitLogicalExpr(expr: Expr.Logical): Nullable<Object> {
+        const left = this.evaluate(expr.left);
+
+        if (expr.operator.type === TokenType.OR) {
+            // or 语句左侧为真时直接返回
+            if (this.isTruthy(left)) {
+                return left;
+            }
+        } else if (expr.operator.type === TokenType.AND) {
+            // and 语句左侧为假时直接返回
+            if (!this.isTruthy(left)) {
+                return left;
+            }
+        }
+
+        return this.evaluate(expr.right);
+    }
+
     public visitGroupingExpr(expr: Expr.Grouping): Nullable<Object> {
         return this.evaluate(expr.expression);
     }

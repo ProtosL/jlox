@@ -92,4 +92,4 @@ export class Lox {
         }
     }
 }
-Lox.main([`./test/testc`]);
+Lox.main([`./test/test9`]);

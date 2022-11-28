@@ -27,7 +27,9 @@ export class Parser {
     /**
      * expression     → assignment ;
      * assignment     → IDENTIFIER "=" assignment
-     *                | equality ;
+                      | logic_or ;
+     * logic_or       → logic_and ( "or" logic_and )* ;
+     * logic_and      → equality ( "and" equality )* ;
      */
     private expression(): Expr.Expr {
         return this.assignment();
@@ -124,8 +126,15 @@ export class Parser {
         return statements;
     }
 
+    /**
+     * 赋值
+     * assignment     → IDENTIFIER "=" assignment
+                      | logic_or ;
+     * logic_or       → logic_and ( "or" logic_and )* ;
+     * logic_and      → equality ( "and" equality )* ;
+     */
     private assignment(): Expr.Expr {
-        const expr: Expr.Expr = this.equality();
+        const expr: Expr.Expr = this.or();
 
         if (this.match(TokenType.EQUAL)) {
             const equals: Token = this.previous();
@@ -137,6 +146,36 @@ export class Parser {
             }
 
             this.error(equals, "Invalid assignment target.");
+        }
+
+        return expr;
+    }
+
+    /**
+     * logic_or       → logic_and ( "or" logic_and )* ;
+     */
+    private or(): Expr.Expr {
+        let expr: Expr.Expr = this.and();
+
+        if (this.match(TokenType.OR)) {
+            const operator: Token = this.previous();
+            const right: Expr.Expr = this.and();
+            expr = new Expr.Logical(expr, operator, right);
+        }
+
+        return expr;
+    }
+
+    /**
+     * logic_and      → equality ( "and" equality )* ;
+     */
+    private and(): Expr.Expr {
+        let expr = this.equality();
+
+        while(this.match(TokenType.AND)) {
+            const operator: Token = this.previous();
+            const right: Expr.Expr = this.equality();
+            expr = new Expr.Logical(expr, operator, right);
         }
 
         return expr;

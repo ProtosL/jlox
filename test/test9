@@ -1,0 +1,9 @@
+print "hi" or 2; // "hi".
+print nil or "yes"; // "yes".
+
+// 9.2
+// var a = 3;
+// if (a < 4)
+//     print 111;
+// else
+//     print 222;
