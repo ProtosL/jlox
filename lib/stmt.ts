@@ -1,10 +1,12 @@
 import { Token } from '../token';
+import { Nullable } from '../type.d';
 import { Expr } from './expr';
 
 export namespace Stmt {
     export interface Visitor<R> {
         visitBlockStmt(stmt: Block): R;
         visitExpressionStmt(stmt: Expression): R;
+        visitIfStmt(stmt: If): R;
         visitPrintStmt(stmt: Print): R;
         visitVarStmt(stmt: Var): R;
     }
@@ -36,6 +38,23 @@ export namespace Stmt {
 
         accept<R>(visitor: Visitor<R>): R {
             return visitor.visitExpressionStmt(this);
+        }
+    }
+
+    export class If extends Stmt {
+        readonly condition: Expr.Expr;
+        readonly thenBranch: Stmt;
+        readonly elseBranch: Nullable<Stmt>;
+
+        constructor(condition: Expr.Expr, thenBranch: Stmt, elseBranch: Nullable<Stmt>) {
+            super();
+            this.condition = condition;
+            this.thenBranch = thenBranch;
+            this.elseBranch = elseBranch;
+        }
+
+        accept<R>(visitor: Visitor<R>): R {
+            return visitor.visitIfStmt(this);
         }
     }
 

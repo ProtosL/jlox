@@ -101,6 +101,15 @@ export class Interpreter implements Expr.Visitor<Nullable<Object>>, Stmt.Visitor
         return ;
     }
 
+    public visitIfStmt(stmt: Stmt.If): void {
+        if (this.isTruthy(this.evaluate(stmt.condition))) {
+            this.execute(stmt.thenBranch);
+        } else {
+            this.execute(stmt.elseBranch);
+        }
+        return ;
+    }
+
     public visitPrintStmt(stmt: Stmt.Print): void {
         const value = this.evaluate(stmt.expression);
         console.log(this.stringify(value));
@@ -141,6 +150,9 @@ export class Interpreter implements Expr.Visitor<Nullable<Object>>, Stmt.Visitor
         return a === b;
     }
 
+    /**
+     * 判断传入的内容是否为真
+     */
     private isTruthy(object: Nullable<Object>): boolean {
         if (object === null) {
             return false;
@@ -159,8 +171,8 @@ export class Interpreter implements Expr.Visitor<Nullable<Object>>, Stmt.Visitor
         return expr.accept(this);
     }
 
-    private execute(stmt: Stmt.Stmt) {
-        stmt.accept(this);
+    private execute(stmt: Nullable<Stmt.Stmt>) {
+        stmt?.accept(this);
     }
 
     executeBlock(statements: Stmt.Stmt[], environment: Environment) {

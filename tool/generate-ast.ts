@@ -19,9 +19,11 @@ class GenerateAst {
         this.defineAst(outputDir, "Stmt", [
             "Block      | statements: Stmt[]",
             "Expression | expression: Expr.Expr",
+            "If         | condition: Expr.Expr, thenBranch: Stmt, elseBranch: Nullable<Stmt>",
             "Print      | expression: Expr.Expr",
             "Var        | name: Token, initializer: Expr.Expr"
         ], [
+            "import { Nullable } from '../type.d';",
             "import { Expr } from './expr';",
         ])
     }

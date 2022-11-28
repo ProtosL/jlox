@@ -3,6 +3,7 @@ import { Expr } from './lib/expr';
 import { Stmt } from './lib/stmt';
 import { TokenType } from './token-type';
 import { Lox } from './lox';
+import { Nullable } from './type';
 
 export class Parser {
     static ParseError: ParseError;
@@ -51,12 +52,18 @@ export class Parser {
 
     /**
      * statement      → exprStmt
+     *                | ifStmt
      *                | printStmt
      *                | block ;
      * 
+     * ifStmt         → "if" "(" expression ")" statement
+     *                ( "else" statement)? ;
      * block          → "{" declaration* "}" ;
      */
     private statement(): Stmt.Stmt {
+        if (this.match(TokenType.IF)) {
+            return this.ifStatement();
+        }
         if (this.match(TokenType.PRINT)) {
             return this.printStatement();
         }
@@ -65,6 +72,20 @@ export class Parser {
         }
 
         return this.expressionStatement();
+    }
+
+    private ifStatement(): Stmt.Stmt {
+        this.consume(TokenType.LEFT_PAREN, "Expect '(' after 'if'.");
+        const condition: Expr.Expr = this.expression();
+        this.consume(TokenType.RIGHT_PAREN, "Expect ')' after if condition.");
+
+        const thenBranch: Stmt.Stmt = this.statement();
+        let elseBranch: Nullable<Stmt.Stmt> = null;
+        if (this.match(TokenType.ELSE)) {
+            elseBranch = this.statement();
+        }
+
+        return new Stmt.If(condition, thenBranch, elseBranch);
     }
 
     private printStatement() {
