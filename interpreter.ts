@@ -6,6 +6,7 @@ import { Lox } from './lox';
 import { Nullable } from "./type.d";
 import { Stmt } from "./lib/stmt";
 import { Environment } from "./environment";
+import { LoxCallable } from './lox-callable';
 
 export class Interpreter implements Expr.Visitor<Nullable<Object>>, Stmt.Visitor<void> {
     private environment = new Environment();
@@ -112,6 +113,18 @@ export class Interpreter implements Expr.Visitor<Nullable<Object>>, Stmt.Visitor
 
         // Unreachable
         return null;
+    }
+
+    public visitCallExpr(expr: Expr.Call): Nullable<Object> {
+        const callee = this.evaluate(expr.callee);
+        
+        const argumentList: Nullable<Object>[] = [];
+        expr.arguments.forEach(argument => {
+            argumentList.push(this.evaluate(argument));
+        });
+
+        const func = callee as LoxCallable;
+        return func.call(this, argumentList);
     }
 
     public visitExpressionStmt(stmt: Stmt.Expression): void {
