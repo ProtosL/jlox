@@ -1,0 +1,5 @@
+fun asdf(c) {
+    print c;
+}
+
+asdf(3);

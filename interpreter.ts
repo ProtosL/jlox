@@ -119,7 +119,7 @@ export class Interpreter implements Expr.Visitor<Nullable<Object>>, Stmt.Visitor
         const callee = this.evaluate(expr.callee);
         
         const argumentList: Nullable<Object>[] = [];
-        expr.arguments.forEach(argument => {
+        expr.argumentList.forEach(argument => {
             argumentList.push(this.evaluate(argument));
         });
 
@@ -128,6 +128,11 @@ export class Interpreter implements Expr.Visitor<Nullable<Object>>, Stmt.Visitor
         }
         
         const func = callee as LoxCallable;
+        // 确保参数数量一致
+        if (argumentList.length !== func.arity()) {
+            throw new RuntimeError(expr.paren, `Expected ${func.arity()} arguments but got ${argumentList.length}.`);
+        }        
+        
         return func.call(this, argumentList);
     }
 

@@ -336,7 +336,7 @@ export class Parser {
         const argumentList: Expr.Expr[] = [];
         if (!this.check(TokenType.RIGHT_PAREN)) {
             do {
-                if (arguments.length >= 255) {
+                if (argumentList.length >= 255) {
                     this.error(this.peek(), "Can't have more than 255 argumetns.");
                 }
                 argumentList.push(this.expression());

@@ -52,13 +52,13 @@ export namespace Expr {
     export class Call extends Expr {
         readonly callee: Expr;
         readonly paren: Token;
-        readonly arguments: Expr[];
+        readonly argumentList: Expr[];
 
-        constructor(callee: Expr, paren: Token, arguments: Expr[]) {
+        constructor(callee: Expr, paren: Token, argumentList: Expr[]) {
             super();
             this.callee = callee;
             this.paren = paren;
-            this.arguments = arguments;
+            this.argumentList = argumentList;
         }
 
         accept<R>(visitor: Visitor<R>): R {
