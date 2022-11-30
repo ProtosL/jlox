@@ -6,7 +6,7 @@ import { Lox } from './lox';
 import { Nullable } from "./type.d";
 import { Stmt } from "./lib/stmt";
 import { Environment } from "./environment";
-import { LoxCallable } from './lox-callable';
+import { instanceOfLoxCallable, LoxCallable } from './lox-callable';
 
 export class Interpreter implements Expr.Visitor<Nullable<Object>>, Stmt.Visitor<void> {
     private environment = new Environment();
@@ -123,6 +123,10 @@ export class Interpreter implements Expr.Visitor<Nullable<Object>>, Stmt.Visitor
             argumentList.push(this.evaluate(argument));
         });
 
+        if (!(instanceOfLoxCallable(callee))) {
+            throw new RuntimeError(expr.paren, "Can only call functions and classes.");
+        }
+        
         const func = callee as LoxCallable;
         return func.call(this, argumentList);
     }

@@ -1,5 +1,6 @@
 import { Nullable } from "./type";
 import { Token } from './token';
+import { RuntimeError } from './runtime-error';
 
 export class Environment {
     readonly enclosing: Nullable<Environment> = null;
@@ -23,7 +24,7 @@ export class Environment {
             return this.enclosing.get(name);
         }
 
-        throw new Error(`Undefined variable ${name.lexeme}.`);
+        throw new RuntimeError(name, `Undefined variable ${name.lexeme}.`);
     }
 
     /**
@@ -40,7 +41,7 @@ export class Environment {
             return;
         }
 
-        throw new Error(`Undefined variable '${name.lexeme}'.`);
+        throw new RuntimeError(name, `Undefined variable '${name.lexeme}'.`);
     }
 
     define(name: string, value: Nullable<Object>) {
