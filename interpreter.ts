@@ -9,7 +9,28 @@ import { Environment } from "./environment";
 import { instanceOfLoxCallable, LoxCallable } from './lox-callable';
 
 export class Interpreter implements Expr.Visitor<Nullable<Object>>, Stmt.Visitor<void> {
-    private environment = new Environment();
+    /**
+     * 最外层环境
+     */
+    readonly globals: Environment = new Environment();
+    private environment = this.globals;
+
+    constructor() {
+        /**
+         * 定义全局函数 clock
+         */
+        this.globals.define('clock', {
+            arity: () => {
+                return 0;
+            },
+            call: (Interpreter: Interpreter, argumentList: Nullable<Object>[]) => {
+                return +new Date() / 1000;
+            },
+            toString: () => {
+                return "<native fn>";
+            }
+        } as LoxCallable);
+    }
     
     public visitLiteralExpr(expr: Expr.Literal): Nullable<Object> {
         return expr.value;
