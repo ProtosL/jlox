@@ -24,6 +24,7 @@ class GenerateAst {
             "Function   | name: Token, params: Token[], body: Stmt[]",
             "If         | condition: Expr.Expr, thenBranch: Stmt, elseBranch: Nullable<Stmt>",
             "Print      | expression: Expr.Expr",
+            "Return     | keyword: Token, value: Nullable<Expr.Expr>",
             "Var        | name: Token, initializer: Expr.Expr",
             "While      | condition: Expr.Expr, body: Stmt"
         ], [

@@ -9,6 +9,7 @@ export namespace Stmt {
         visitFunctionStmt(stmt: Function): R;
         visitIfStmt(stmt: If): R;
         visitPrintStmt(stmt: Print): R;
+        visitReturnStmt(stmt: Return): R;
         visitVarStmt(stmt: Var): R;
         visitWhileStmt(stmt: While): R;
     }
@@ -87,6 +88,21 @@ export namespace Stmt {
 
         accept<R>(visitor: Visitor<R>): R {
             return visitor.visitPrintStmt(this);
+        }
+    }
+
+    export class Return extends Stmt {
+        readonly keyword: Token;
+        readonly value: Nullable<Expr.Expr>;
+
+        constructor(keyword: Token, value: Nullable<Expr.Expr>) {
+            super();
+            this.keyword = keyword;
+            this.value = value;
+        }
+
+        accept<R>(visitor: Visitor<R>): R {
+            return visitor.visitReturnStmt(this);
         }
     }
 

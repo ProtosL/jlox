@@ -5,7 +5,12 @@ export enum TokenType {
      * 逗号
      */
     COMMA,
-    DOT, MINUS, PLUS, SEMICOLON, SLASH, STAR,
+    DOT, MINUS, PLUS, 
+    /**
+     * 分号
+     */
+    SEMICOLON, 
+    SLASH, STAR,
 
     // One or two character tokens.
     BANG, BANG_EQUAL,

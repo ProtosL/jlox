@@ -12,16 +12,27 @@
  * varDecl        → "var" IDENTIFIER ( "=" expression )? ";" ;
  * 
  * statement      → exprStmt
+ *                | forStmt
  *                | ifStmt
  *                | printStmt 
+ *                | returnStmt
+ *                | whileStmt
  *                | block ;
  * 
  * exprStmt       → expression ";" ;
  * 
+ * forStmt        → "for" "(" ( varDecl | exprStmt | ";" )
+ *                  expression? ";"
+ *                  expression? ")" statement ;
+ * 
  * ifStmt         → "if" "(" expression ")" statement ( "else" statement )? ;
  * 
  * printStmt      → "print" expression ";" ;
-
+ * 
+ * returnStmt     → "return" expression? ";" ;
+ * 
+ * whileStmt      → "while" "(" expression ")" statement ;
+ * 
  * expression     → assignment ;
  * assignment     → IDENTIFIER "=" assignment
  *                | logic_or ;
@@ -109,6 +120,7 @@ export class Parser {
      *                | forStmt
      *                | ifStmt
      *                | printStmt
+     *                | returnStmt
      *                | whileStmt
      *                | block ;
      * 
@@ -117,6 +129,9 @@ export class Parser {
      * .                expression? ")" statement ;
      * ifStmt         → "if" "(" expression ")" statement
      *                ( "else" statement)? ;
+     * 
+     * returnStmt     → "return" expression? ";" ;
+     * 
      * block          → "{" declaration* "}" ;
      */
     private statement(): Stmt.Stmt {
@@ -128,6 +143,9 @@ export class Parser {
         }
         if (this.match(TokenType.PRINT)) {
             return this.printStatement();
+        }
+        if (this.match(TokenType.RETURN)) {
+            return this.returnStatement();
         }
         if (this.match(TokenType.WHILE)) {
             return this.whileStatement();
@@ -214,6 +232,17 @@ export class Parser {
         const value: Expr.Expr = this.expression();
         this.consume(TokenType.SEMICOLON, "Expect ';' after value.");
         return new Stmt.Print(value);
+    }
+
+    private returnStatement() {
+        const keyword: Token = this.previous();
+        let value: Nullable<Expr.Expr> = null;
+        if (!this.check(TokenType.SEMICOLON)) {
+            value = this.expression();
+        }
+
+        this.consume(TokenType.SEMICOLON, "Expect ';' after return value.");
+        return new Stmt.Return(keyword, value);
     }
 
     private varDeclaration(): Stmt.Stmt {
