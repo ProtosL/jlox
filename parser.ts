@@ -1,3 +1,46 @@
+/**
+ * program        → declaration* EOF ;
+ * 
+ * declaration    → funDecl
+ *                | varDecl
+ *                | statement ;
+ * 
+ * funDecl        → "fun" function ;
+ * function       → IDENTIFIER "(" parameters? ")" block ;
+ * parameters     → IDENTIFIER ( "," IDENTIFIER )* ;
+ * 
+ * varDecl        → "var" IDENTIFIER ( "=" expression )? ";" ;
+ * 
+ * statement      → exprStmt
+ *                | ifStmt
+ *                | printStmt 
+ *                | block ;
+ * 
+ * exprStmt       → expression ";" ;
+ * 
+ * ifStmt         → "if" "(" expression ")" statement ( "else" statement )? ;
+ * 
+ * printStmt      → "print" expression ";" ;
+
+ * expression     → assignment ;
+ * assignment     → IDENTIFIER "=" assignment
+ *                | logic_or ;
+ * logic_or       → logic_and ( "or" logic_and )* ;
+ * logic_and      → equality ( "and" equality )* ;
+ * equality       → comparison ( ( "!=" | "==" ) comparison )* ;
+ * comparison     → term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
+ * term           → factor ( ( "-" | "+" ) factor )* ;
+ * factor         → unary ( ( "/" | "*" ) unary )* ;
+ * # 一元表达式可以嵌套，形如 !!
+ * unary          → ( "!" | "-" ) unary
+ *                | call ;
+ * call           → primary ( "(" arguments? ")" )* ;
+ * arguments      → expression ( "," expression )* ;
+ * primary        → NUMBER | STRING 
+ *                | "true" | "false" | "nil"
+ *                | "(" expression ")" 
+ *                | IDENTIFIER ;
+ */
 import { Token } from './token';
 import { Expr } from './lib/expr';
 import { Stmt } from './lib/stmt';
@@ -36,11 +79,20 @@ export class Parser {
     }
 
     /**
-     * declaration    → varDecl
+     * declaration    → funDecl
+     *                | varDecl
      *                | statement ;
+     * 
+     * funDecl        → "fun" function ;
+     * function       → IDENTIFIER "(" parameters? ")" block ;
+     * 
+     * parameters     → IDENTIFIER ( "," IDENTIFIER )* ;
      */
     private declaration(): Stmt.Stmt {
         try {
+            if (this.match(TokenType.FUN)) {
+                return this.function("function");
+            }
             if (this.match(TokenType.VAR)) {
                 return this.varDeclaration();
             }
@@ -190,6 +242,30 @@ export class Parser {
         const expr: Expr.Expr = this.expression();
         this.consume(TokenType.SEMICOLON, "Expect ';' after expression.");
         return new Stmt.Expression(expr);
+    }
+
+    /**
+     * function       → IDENTIFIER "(" parameters? ")" block ;
+     * parameters     → IDENTIFIER ( "," IDENTIFIER )* ;
+     */
+    private function(kind: string): Stmt.Function {
+        const name: Token = this.consume(TokenType.IDENTIFIER, `Expect ${kind} name.`);
+        this.consume(TokenType.LEFT_PAREN, `Expect '(' after ${kind} name.`);
+        const parameters: Token[] = [];        
+        if (!this.check(TokenType.RIGHT_PAREN)) {
+            do {
+                if (parameters.length >= 255) {
+                    this.error(this.peek(), "Can't have more than 255 parameters.");
+                }
+
+                parameters.push(this.consume(TokenType.IDENTIFIER, "Expect parameter name."));
+            } while (this.match(TokenType.COMMA));
+        }
+        this.consume(TokenType.RIGHT_PAREN, "Expect ')' after parameters.");
+
+        this.consume(TokenType.LEFT_BRACE, `Expect '{' before ${kind} body.`);
+        const body: Stmt.Stmt[] = this.block();
+        return new Stmt.Function(name, parameters, body);
     }
 
     private block(): Stmt.Stmt[] {
@@ -408,7 +484,7 @@ export class Parser {
     }
 
     /**
-     * 检查 token 是否为指定的 TokenType，是则返回 token，否则报告错误
+     * 检查 token 是否为指定的 TokenType，是则返回 token 并向前推进一位，否则报告错误
      */
     private consume(type: TokenType, message: string): Token {
         if (this.check(type)) {
