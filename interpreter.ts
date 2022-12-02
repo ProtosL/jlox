@@ -8,6 +8,7 @@ import { Stmt } from "./lib/stmt";
 import { Environment } from "./environment";
 import { instanceOfLoxCallable, LoxCallable } from './lox-callable';
 import { LoxFunction } from './lox-function';
+import { Return } from './return';
 
 export class Interpreter implements Expr.Visitor<Nullable<Object>>, Stmt.Visitor<void> {
     /**
@@ -181,6 +182,15 @@ export class Interpreter implements Expr.Visitor<Nullable<Object>>, Stmt.Visitor
         const value = this.evaluate(stmt.expression);
         console.log(this.stringify(value));
         return ;
+    }
+
+    public visitReturnStmt(stmt: Stmt.Return): void {
+        let value: Nullable<Object> = null;
+        if (stmt.value !== null) {
+            value = this.evaluate(stmt.value);
+        }
+
+        throw new Return(value);
     }
 
     public visitVarStmt(stmt: Stmt.Var): void {
