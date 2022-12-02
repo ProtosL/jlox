@@ -7,6 +7,7 @@ import { Nullable } from "./type.d";
 import { Stmt } from "./lib/stmt";
 import { Environment } from "./environment";
 import { instanceOfLoxCallable, LoxCallable } from './lox-callable';
+import { LoxFunction } from './lox-function';
 
 export class Interpreter implements Expr.Visitor<Nullable<Object>>, Stmt.Visitor<void> {
     /**
@@ -160,6 +161,11 @@ export class Interpreter implements Expr.Visitor<Nullable<Object>>, Stmt.Visitor
     public visitExpressionStmt(stmt: Stmt.Expression): void {
         this.evaluate(stmt.expression);
         return ;
+    }
+
+    public visitFunctionStmt(stmt: Stmt.Function): void {
+        const fun: LoxFunction = new LoxFunction(stmt);
+        this.environment.define(stmt.name.lexeme, fun);
     }
 
     public visitIfStmt(stmt: Stmt.If): void {
