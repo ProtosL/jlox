@@ -165,7 +165,7 @@ export class Interpreter implements Expr.Visitor<Nullable<Object>>, Stmt.Visitor
     }
 
     public visitFunctionStmt(stmt: Stmt.Function): void {
-        const fun: LoxFunction = new LoxFunction(stmt);
+        const fun: LoxFunction = new LoxFunction(stmt, this.environment);
         this.environment.define(stmt.name.lexeme, fun);
     }
 

@@ -6,8 +6,10 @@ import { Nullable } from "./type";
 
 export class LoxFunction implements LoxCallable {
     private readonly declaration: Stmt.Function;
+    private readonly closure: Environment;
 
-    constructor(declaration: Stmt.Function) {
+    constructor(declaration: Stmt.Function, closure: Environment) {
+        this.closure = closure;
         this.declaration = declaration;
     }
 
@@ -20,7 +22,7 @@ export class LoxFunction implements LoxCallable {
     };
 
     public call(interpreter: Interpreter, argumentList: Nullable<Object>[]) {
-        const environment: Environment = new Environment(interpreter.globals);
+        const environment: Environment = new Environment(this.closure);
         for (let i = 0; i < this.declaration.params.length; i++) {
             environment.define(this.declaration.params[i].lexeme, argumentList[i]);
         }
