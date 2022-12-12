@@ -143,6 +143,11 @@ export class Resolver implements Expr.Visitor<void>, Stmt.Visitor<void> {
         }
 
         const scope = this.peekScopes();
+
+        if (scope.get(name.lexeme)) {
+            Lox.error(name, "Already a variable with this name in this scope.");
+        }
+        
         // 设置为 false，表示该变量还未准备好
         scope.set(name.lexeme, false);
     }
