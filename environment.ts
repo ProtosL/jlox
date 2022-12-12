@@ -60,4 +60,8 @@ export class Environment {
     getAt(distance: number, name: string): Nullable<Object> {
         return this.ancestor(distance).values.get(name) || null;
     }
+
+    assignAt(distance: number, name: Token, value: Nullable<Object>) {
+        this.ancestor(distance).values.set(name.lexeme, value);
+    }
 }

@@ -216,12 +216,18 @@ export class Interpreter implements Expr.Visitor<Nullable<Object>>, Stmt.Visitor
         while (this.isTruthy(this.evaluate(stmt.condition))) {
             this.execute(stmt.body);
         }
-
     }
 
     public visitAssignExpr(expr: Expr.Assign): Nullable<Object> {
         const value = this.evaluate(expr.value);
-        this.environment.assign(expr.name, value);
+
+        const distance = this.locals.get(expr);
+        if (distance !== undefined) {
+            this.environment.assignAt(distance, expr.name, value);
+        } else {
+            this.globals.assign(expr.name, value);
+        }
+        
         return value;
     }
 
