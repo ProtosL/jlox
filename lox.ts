@@ -6,6 +6,7 @@ import { Token } from './token';
 import { Parser } from './parser';
 import { AstPrinter } from './ast-printer';
 import { Interpreter } from './interpreter';
+import { Resolver } from './resolver';
 
 export class Lox {
     private static readonly interpreter = new Interpreter();
@@ -62,6 +63,10 @@ export class Lox {
         if (this.hasError) {
             return;
         }
+
+        // 存在语法错误时不运行解析器
+        const resolver: Resolver = new Resolver(this.interpreter);
+        resolver.resolveStatements(statements);
 
         this.interpreter.interpret(statements);
     }
