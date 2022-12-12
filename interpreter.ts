@@ -16,6 +16,7 @@ export class Interpreter implements Expr.Visitor<Nullable<Object>>, Stmt.Visitor
      */
     readonly globals: Environment = new Environment();
     private environment = this.globals;
+    private readonly locals: Map<Expr.Expr, number> = new Map();
 
     constructor() {
         /**
@@ -257,6 +258,10 @@ export class Interpreter implements Expr.Visitor<Nullable<Object>>, Stmt.Visitor
 
     private execute(stmt: Nullable<Stmt.Stmt>) {
         stmt?.accept(this);
+    }
+
+    resolve(expr: Expr.Expr, depth: number) {
+        this.locals.set(expr, depth);
     }
 
     executeBlock(statements: Stmt.Stmt[], environment: Environment) {
