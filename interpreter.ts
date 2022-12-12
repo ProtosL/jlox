@@ -78,7 +78,16 @@ export class Interpreter implements Expr.Visitor<Nullable<Object>>, Stmt.Visitor
     }
 
     public visitVariableExpr(expr: Expr.Variable): Nullable<Object> {
-        return this.environment.get(expr.name);
+        return this.lookUpVariable(expr.name, expr);
+    }
+
+    private lookUpVariable(name: Token, expr: Expr.Expr): Nullable<Object> {
+        const distance = this.locals.get(expr);
+        if (distance !== undefined) {
+            return this.environment.getAt(distance, name.lexeme);
+        } else {
+            return this.globals.get(name);
+        }
     }
 
     private checkNumberOperand(operator: Token, operand: Nullable<Object>) {

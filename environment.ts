@@ -47,4 +47,17 @@ export class Environment {
     define(name: string, value: Nullable<Object>) {
         this.values.set(name, value);
     }
+
+    ancestor(distance: number): Environment {
+        let environment = this as Environment;
+        for (let i = 0; i < distance; i++) {
+            environment = environment.enclosing as Environment;
+        }
+
+        return environment;
+    }
+    
+    getAt(distance: number, name: string): Nullable<Object> {
+        return this.ancestor(distance).values.get(name) || null;
+    }
 }
