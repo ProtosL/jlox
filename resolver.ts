@@ -2,6 +2,7 @@ import { Expr } from './lib/expr';
 import { Stmt } from './lib/stmt';
 import { Interpreter } from './interpreter';
 import { Token } from './token';
+import { Lox } from './lox';
 
 export class Resolver implements Expr.Visitor<void>, Stmt.Visitor<void> {
     private readonly interpreter: Interpreter;
@@ -23,6 +24,15 @@ export class Resolver implements Expr.Visitor<void>, Stmt.Visitor<void> {
             this.resolveExpr(stmt.initializer);
         }
         this.define(stmt.name);
+    }
+
+    public visitVariableExpr(expr: Expr.Variable): void {
+        // 如果当前变量存在于当前作用域中，但值是 false，表示已经声明了但还未定义，抛出错误
+        if (!this.scopes.length && this.peekScopes().get(expr.name.lexeme) === false) {
+            Lox.error(expr.name, "Can't read local variable in its own initializer.");
+        }
+
+        this.resovleLocal(expr, expr.name);
     }
 
     resolveStatements(statements: Stmt.Stmt[]) {
@@ -53,9 +63,7 @@ export class Resolver implements Expr.Visitor<void>, Stmt.Visitor<void> {
         }
 
         const scope = this.peekScopes();
-        /**
-         * 设置为 false，表示该变量还未准备好
-         */
+        // 设置为 false，表示该变量还未准备好
         scope.set(name.lexeme, false);
     }
 
@@ -64,6 +72,16 @@ export class Resolver implements Expr.Visitor<void>, Stmt.Visitor<void> {
             return;
         }
         this.peekScopes().set(name.lexeme, true);
+    }
+
+    private resolveLocal(expr: Expr.Expr, name: Token) {
+        // 从最内层开始，
+        for (let i = this.scopes.length - 1; i >= 0; i--) {
+            if (this.scopes[i].has(name.lexeme)) {
+                this.interpreter.resolve(expr, this.scopes.length - 1 - i);
+                return;
+            }
+        }
     }
 
     /**
