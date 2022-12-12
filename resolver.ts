@@ -18,6 +18,13 @@ export class Resolver implements Expr.Visitor<void>, Stmt.Visitor<void> {
         this.endScope();
     }
 
+    public visitFunctionStmt(stmt: Stmt.Function): void {
+        this.declare(stmt.name);
+        this.define(stmt.name);
+
+        this.resolveFunction(stmt);
+    }
+
     public visitVarStmt(stmt: Stmt.Var): void {
         this.declare(stmt.name);
         if (stmt.initializer !== null) {
@@ -52,6 +59,16 @@ export class Resolver implements Expr.Visitor<void>, Stmt.Visitor<void> {
 
     resolveExpr(expr: Expr.Expr) {
         expr.accept(this);
+    }
+
+    private resolveFunction(func: Stmt.Function) {
+        this.beginScope();
+        func.params.forEach((param: Token) => {
+            this.declare(param);
+            this.define(param);
+        })
+        this.resolveStatements(func.body);
+        this.endScope();
     }
 
     private beginScope(): void {
