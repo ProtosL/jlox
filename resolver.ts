@@ -18,11 +18,69 @@ export class Resolver implements Expr.Visitor<void>, Stmt.Visitor<void> {
         this.endScope();
     }
 
+    public visitExpressionStmt(stmt: Stmt.Expression): void {
+        this.resolveExpr(stmt.expression);
+    }
+
     public visitFunctionStmt(stmt: Stmt.Function): void {
         this.declare(stmt.name);
         this.define(stmt.name);
 
         this.resolveFunction(stmt);
+    }
+
+    public visitIfStmt(stmt: Stmt.If): void {
+        this.resolveStatement(stmt);
+        this.resolveStatement(stmt.thenBranch);
+        // 不管条件，有就解析
+        if (stmt.elseBranch !== null) {
+            this.resolveStatement(stmt.elseBranch);
+        }
+    }
+
+    public visitPrintStmt(stmt: Stmt.Print): void {
+        this.resolveExpr(stmt.expression);
+    }
+
+    public visitReturnStmt(stmt: Stmt.Return): void {
+        if (stmt.value !== null) {
+            this.resolveExpr(stmt.value);
+        }
+    }
+
+    public visitWhileStmt(stmt: Stmt.While): void {
+        this.resolveExpr(stmt.condition);
+        this.resolveStatement(stmt.body);
+    }
+
+    public visitBinaryExpr(expr: Expr.Binary): void {
+        this.resolveExpr(expr.left);
+        this.resolveExpr(expr.right);
+    }
+
+    public visitCallExpr(expr: Expr.Call): void {
+        this.resolveExpr(expr.callee);
+
+        expr.argumentList.forEach(argument => {
+            this.resolveExpr(argument);
+        })
+    }
+
+    public visitGroupingExpr(expr: Expr.Grouping): void {
+        this.resolveExpr(expr.expression);
+    }
+
+    public visitLiteralExpr(expr: Expr.Literal): void {
+        return;
+    }
+
+    public visitLogicalExpr(expr: Expr.Logical): void {
+        this.resolveExpr(expr.left);
+        this.resolveExpr(expr.right);
+    }
+
+    public visitUnaryExpr(expr: Expr.Unary): void {
+        this.resolveExpr(expr.right);
     }
 
     public visitVarStmt(stmt: Stmt.Var): void {
