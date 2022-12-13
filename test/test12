@@ -1,15 +1,24 @@
-class Thing {
-    getCallback() {
-    fun localFunction() {
-      print this;
-        }
-
-        return localFunction;
+class Foo {
+    init() {
+    print this;
     }
 }
 
-var callback = Thing().getCallback();
-callback();
+var foo = Foo();
+print foo.init();
+
+// class Thing {
+//     getCallback() {
+//     fun localFunction() {
+//       print this;
+//         }
+
+//         return localFunction;
+//     }
+// }
+
+// var callback = Thing().getCallback();
+// callback();
 
 // class Bacon {
 //     eat() {

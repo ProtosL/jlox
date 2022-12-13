@@ -8,16 +8,18 @@ import { LoxInstance } from './lox-instance';
 export class LoxFunction implements LoxCallable {
     private readonly declaration: Stmt.Function;
     private readonly closure: Environment;
+    private readonly isInitializer: boolean;
 
-    constructor(declaration: Stmt.Function, closure: Environment) {
+    constructor(declaration: Stmt.Function, closure: Environment, isInitializer: boolean) {
         this.closure = closure;
         this.declaration = declaration;
+        this.isInitializer = isInitializer;
     }
 
     bind(instance: LoxInstance): LoxFunction {
         const enviroment: Environment = new Environment(this.closure);
         enviroment.define("this", instance);
-        return new LoxFunction(this.declaration, enviroment);
+        return new LoxFunction(this.declaration, enviroment, this.isInitializer);
     }
 
     public toString(): string {
@@ -38,6 +40,10 @@ export class LoxFunction implements LoxCallable {
             interpreter.executeBlock(this.declaration.body, environment);
         } catch (returnValue: any) {
             return returnValue.value;            
+        }
+
+        if (this.isInitializer) {
+            return this.closure.getAt(0, "this");
         }
         return null;
     }

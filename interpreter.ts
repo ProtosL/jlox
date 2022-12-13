@@ -202,7 +202,7 @@ export class Interpreter implements Expr.Visitor<Nullable<Object>>, Stmt.Visitor
     }
 
     public visitFunctionStmt(stmt: Stmt.Function): void {
-        const fun: LoxFunction = new LoxFunction(stmt, this.environment);
+        const fun: LoxFunction = new LoxFunction(stmt, this.environment, false);
         this.environment.define(stmt.name.lexeme, fun);
     }
 
@@ -327,7 +327,7 @@ export class Interpreter implements Expr.Visitor<Nullable<Object>>, Stmt.Visitor
 
         const methods: Map<string, LoxFunction> = new Map();
         stmt.methods.forEach(method => {
-            const func: LoxFunction = new LoxFunction(method, this.environment);
+            const func: LoxFunction = new LoxFunction(method, this.environment, method.name.lexeme === "init");
             methods.set(method.name.lexeme, func);
         })
         
