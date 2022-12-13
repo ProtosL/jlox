@@ -71,6 +71,10 @@ export class Interpreter implements Expr.Visitor<Nullable<Object>>, Stmt.Visitor
         return value;
     }
 
+    public visitThisExpr(expr: Expr.This): Nullable<Object> {
+        return this.lookUpVariable(expr.keyword, expr);
+    }
+
     public visitGroupingExpr(expr: Expr.Grouping): Nullable<Object> {
         return this.evaluate(expr.expression);
     }

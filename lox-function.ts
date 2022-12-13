@@ -3,6 +3,7 @@ import { LoxCallable } from "./lox-callable";
 import { Interpreter } from './interpreter';
 import { Environment } from './environment';
 import { Nullable } from "./type";
+import { LoxInstance } from './lox-instance';
 
 export class LoxFunction implements LoxCallable {
     private readonly declaration: Stmt.Function;
@@ -11,6 +12,12 @@ export class LoxFunction implements LoxCallable {
     constructor(declaration: Stmt.Function, closure: Environment) {
         this.closure = closure;
         this.declaration = declaration;
+    }
+
+    bind(instance: LoxInstance): LoxFunction {
+        const enviroment: Environment = new Environment(this.closure);
+        enviroment.define("this", instance);
+        return new LoxFunction(this.declaration, enviroment);
     }
 
     public toString(): string {

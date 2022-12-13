@@ -27,7 +27,6 @@ export class LoxClass implements LoxCallable {
 
     public call(interpreter: Interpreter, argumentList: Nullable<Object>[]) {
         const instance: LoxInstance = new LoxInstance(this);
-        console.log(instance.toString())
         return instance;
     }
 
