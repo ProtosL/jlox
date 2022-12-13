@@ -101,6 +101,11 @@ export class Resolver implements Expr.Visitor<void>, Stmt.Visitor<void> {
         this.resolveExpr(expr.right);
     }
 
+    public visitSetExpr(expr: Expr.Set): void {
+        this.resolveExpr(expr.value);
+        this.resolveExpr(expr.object);
+    }
+
     public visitUnaryExpr(expr: Expr.Unary): void {
         this.resolveExpr(expr.right);
     }

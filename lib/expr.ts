@@ -10,6 +10,7 @@ export namespace Expr {
         visitGroupingExpr(expr: Grouping): R;
         visitLiteralExpr(expr: Literal): R;
         visitLogicalExpr(expr: Logical): R;
+        visitSetExpr(expr: Set): R;
         visitUnaryExpr(expr: Unary): R;
         visitVariableExpr(expr: Variable): R;
     }
@@ -122,6 +123,23 @@ export namespace Expr {
 
         accept<R>(visitor: Visitor<R>): R {
             return visitor.visitLogicalExpr(this);
+        }
+    }
+
+    export class Set extends Expr {
+        readonly object: Expr;
+        readonly name: Token;
+        readonly value: Expr;
+
+        constructor(object: Expr, name: Token, value: Expr) {
+            super();
+            this.object = object;
+            this.name = name;
+            this.value = value;
+        }
+
+        accept<R>(visitor: Visitor<R>): R {
+            return visitor.visitSetExpr(this);
         }
     }
 

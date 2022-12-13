@@ -37,7 +37,7 @@
  * whileStmt      → "while" "(" expression ")" statement ;
  * 
  * expression     → assignment ;
- * assignment     → IDENTIFIER "=" assignment
+ * assignment     → ( call "." )? IDENTIFIER "=" assignment
  *                | logic_or ;
  * logic_or       → logic_and ( "or" logic_and )* ;
  * logic_and      → equality ( "and" equality )* ;
@@ -349,6 +349,9 @@ export class Parser {
             if (expr instanceof Expr.Variable) {
                 const name: Token = expr.name;
                 return new Expr.Assign(name, value);
+            } else if (expr instanceof Expr.Get) {
+                const get: Expr.Get = expr;
+                return new Expr.Set(get.object, get.name, value);
             }
 
             this.error(equals, "Invalid assignment target.");

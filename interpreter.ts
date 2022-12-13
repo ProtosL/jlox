@@ -59,6 +59,18 @@ export class Interpreter implements Expr.Visitor<Nullable<Object>>, Stmt.Visitor
         return this.evaluate(expr.right);
     }
 
+    public visitSetExpr(expr: Expr.Set): Nullable<Object> {
+        const object: Nullable<Object> = this.evaluate(expr.object);
+
+        if (!(object instanceof LoxInstance)) {
+            throw new RuntimeError(expr.name, "Only instances have fields.");
+        }
+
+        const value: Nullable<Object> = this.evaluate(expr.value);
+        object.set(expr.name, value);
+        return value;
+    }
+
     public visitGroupingExpr(expr: Expr.Grouping): Nullable<Object> {
         return this.evaluate(expr.expression);
     }

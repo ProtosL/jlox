@@ -13,6 +13,7 @@ class GenerateAst {
             "Grouping | expression: Expr",
             "Literal  | value: Nullable<Object>",
             "Logical  | left: Expr, operator: Token, right: Expr",
+            "Set      | object: Expr, name: Token, value: Expr",
             "Unary    | operator: Token, right: Expr",
             "Variable | name: Token"
         ], [
