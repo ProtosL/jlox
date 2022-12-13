@@ -27,10 +27,19 @@ export class LoxClass implements LoxCallable {
 
     public call(interpreter: Interpreter, argumentList: Nullable<Object>[]) {
         const instance: LoxInstance = new LoxInstance(this);
+        const initializer: Nullable<LoxFunction> = this.findMethod("init");
+        if (initializer !== null) {
+            initializer.bind(instance).call(interpreter, argumentList);
+        }
+        
         return instance;
     }
 
     public arity(): number {
-        return 0;
+        const initializer: Nullable<LoxFunction> = this.findMethod("init");
+        if (initializer === null) {
+            return 0;
+        }
+        return initializer.arity();
     }
 }
