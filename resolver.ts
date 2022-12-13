@@ -84,6 +84,10 @@ export class Resolver implements Expr.Visitor<void>, Stmt.Visitor<void> {
         })
     }
 
+    public visitGetExpr(expr: Expr.Get): void {
+        this.resolveExpr(expr.object);
+    }
+
     public visitGroupingExpr(expr: Expr.Grouping): void {
         this.resolveExpr(expr.expression);
     }

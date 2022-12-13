@@ -9,6 +9,7 @@ class GenerateAst {
             "Assign   | name: Token, value: Expr",
             "Binary   | left: Expr, operator: Token, right: Expr",
             "Call     | callee: Expr, paren: Token, argumentList: Expr[]",
+            "Get      | object: Expr, name: Token",
             "Grouping | expression: Expr",
             "Literal  | value: Nullable<Object>",
             "Logical  | left: Expr, operator: Token, right: Expr",

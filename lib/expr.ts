@@ -6,6 +6,7 @@ export namespace Expr {
         visitAssignExpr(expr: Assign): R;
         visitBinaryExpr(expr: Binary): R;
         visitCallExpr(expr: Call): R;
+        visitGetExpr(expr: Get): R;
         visitGroupingExpr(expr: Grouping): R;
         visitLiteralExpr(expr: Literal): R;
         visitLogicalExpr(expr: Logical): R;
@@ -63,6 +64,21 @@ export namespace Expr {
 
         accept<R>(visitor: Visitor<R>): R {
             return visitor.visitCallExpr(this);
+        }
+    }
+
+    export class Get extends Expr {
+        readonly object: Expr;
+        readonly name: Token;
+
+        constructor(object: Expr, name: Token) {
+            super();
+            this.object = object;
+            this.name = name;
+        }
+
+        accept<R>(visitor: Visitor<R>): R {
+            return visitor.visitGetExpr(this);
         }
     }
 

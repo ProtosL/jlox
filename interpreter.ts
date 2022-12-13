@@ -10,6 +10,7 @@ import { instanceOfLoxCallable, LoxCallable } from './lox-callable';
 import { LoxFunction } from './lox-function';
 import { Return } from './return';
 import { LoxClass } from './lox-class';
+import { LoxInstance } from './lox-instance';
 
 export class Interpreter implements Expr.Visitor<Nullable<Object>>, Stmt.Visitor<void> {
     /**
@@ -168,6 +169,15 @@ export class Interpreter implements Expr.Visitor<Nullable<Object>>, Stmt.Visitor
         }        
         
         return func.call(this, argumentList);
+    }
+
+    public visitGetExpr(expr: Expr.Get): Nullable<Object> {
+        const object: Nullable<Object> = this.evaluate(expr.object);
+        if (object instanceof LoxInstance) {
+            return object.get(expr.name);
+        }
+
+        throw new RuntimeError(expr.name, "Only instances have properties.");
     }
 
     public visitExpressionStmt(stmt: Stmt.Expression): void {
