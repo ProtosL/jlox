@@ -10,6 +10,11 @@ enum EFunctionType {
     METHOD
 }
 
+enum EClassType {
+    NONE,
+    CLASS
+}
+
 export class Resolver implements Expr.Visitor<void>, Stmt.Visitor<void> {
     private readonly interpreter: Interpreter;
     private readonly scopes: Map<string, boolean>[] = [];
@@ -17,6 +22,7 @@ export class Resolver implements Expr.Visitor<void>, Stmt.Visitor<void> {
      * 当前访问的代码是否在函数声明中
      */
     private currentFunction: EFunctionType = EFunctionType.NONE;
+    private currentClass: EClassType = EClassType.NONE;
 
     constructor(interpreter: Interpreter) {
         this.interpreter = interpreter;
@@ -29,9 +35,11 @@ export class Resolver implements Expr.Visitor<void>, Stmt.Visitor<void> {
     }
 
     public visitClassStmt(stmt: Stmt.Class): void {
+        const enclosingClass = this.currentClass;
+        this.currentClass = EClassType.CLASS;
+        
         this.declare(stmt.name);
         this.define(stmt.name);
-
 
         this.beginScope();
         this.peekScopes().set("this", true);
@@ -42,6 +50,8 @@ export class Resolver implements Expr.Visitor<void>, Stmt.Visitor<void> {
         })
 
         this.endScope();
+
+        this.currentClass = enclosingClass;
     }
 
     public visitExpressionStmt(stmt: Stmt.Expression): void {
@@ -119,6 +129,11 @@ export class Resolver implements Expr.Visitor<void>, Stmt.Visitor<void> {
     }
 
     public visitThisExpr(expr: Expr.This): void {
+        if (this.currentClass === EClassType.NONE) {
+            Lox.error(expr.keyword, "Cant't use 'this' outside of a class.");
+            return;
+        }
+        
         this.resolveLocal(expr, expr.keyword);
     }
 
