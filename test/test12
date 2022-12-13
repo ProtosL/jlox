@@ -1,11 +1,24 @@
 class Foo {
     init() {
-    print this;
+        return;
     }
 }
 
-var foo = Foo();
-print foo.init();
+// class Foo {
+//     init() {
+//         return "something else";
+//     }
+// }
+
+
+// class Foo {
+//     init() {
+//     print this;
+//     }
+// }
+
+// var foo = Foo();
+// print foo.init();
 
 // class Thing {
 //     getCallback() {
