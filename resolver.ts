@@ -27,6 +27,11 @@ export class Resolver implements Expr.Visitor<void>, Stmt.Visitor<void> {
         this.endScope();
     }
 
+    public visitClassStmt(stmt: Stmt.Class): void {
+        this.declare(stmt.name);
+        this.define(stmt.name);
+    }
+
     public visitExpressionStmt(stmt: Stmt.Expression): void {
         this.resolveExpr(stmt.expression);
     }
@@ -111,7 +116,7 @@ export class Resolver implements Expr.Visitor<void>, Stmt.Visitor<void> {
 
     public visitVariableExpr(expr: Expr.Variable): void {
         // 如果当前变量存在于当前作用域中，但值是 false，表示已经声明了但还未定义，抛出错误
-        if (!this.scopes.length && this.peekScopes().get(expr.name.lexeme) === false) {
+        if (!this.scopes.length && this.peekScopes()?.get(expr.name.lexeme) === false) {
             Lox.error(expr.name, "Can't read local variable in its own initializer.");
         }
 

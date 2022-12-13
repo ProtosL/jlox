@@ -20,6 +20,7 @@ class GenerateAst {
 
         this.defineAst(outputDir, "Stmt", [
             "Block      | statements: Stmt[]",
+            "Class      | name: Token, methods: Stmt.Function[]",
             "Expression | expression: Expr.Expr",
             "Function   | name: Token, params: Token[], body: Stmt[]",
             "If         | condition: Expr.Expr, thenBranch: Stmt, elseBranch: Nullable<Stmt>",

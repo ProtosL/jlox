@@ -9,6 +9,7 @@ import { Environment } from "./environment";
 import { instanceOfLoxCallable, LoxCallable } from './lox-callable';
 import { LoxFunction } from './lox-function';
 import { Return } from './return';
+import { LoxClass } from './lox-class';
 
 export class Interpreter implements Expr.Visitor<Nullable<Object>>, Stmt.Visitor<void> {
     /**
@@ -293,6 +294,12 @@ export class Interpreter implements Expr.Visitor<Nullable<Object>>, Stmt.Visitor
 
     public visitBlockStmt(stmt: Stmt.Block): void {
         this.executeBlock(stmt.statements, new Environment(this.environment));
+    }
+
+    public visitClassStmt(stmt: Stmt.Class): void {
+        this.environment.define(stmt.name.lexeme, null);
+        const klass: LoxClass = new LoxClass(stmt.name.lexeme);
+        this.environment.assign(stmt.name, klass);
     }
 
     interpret(statements: Stmt.Stmt[]) {
