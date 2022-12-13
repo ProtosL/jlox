@@ -6,7 +6,8 @@ import { Lox } from './lox';
 
 enum EFunctionType {
     NONE,
-    FUNCTION
+    FUNCTION,
+    METHOD
 }
 
 export class Resolver implements Expr.Visitor<void>, Stmt.Visitor<void> {
@@ -30,6 +31,11 @@ export class Resolver implements Expr.Visitor<void>, Stmt.Visitor<void> {
     public visitClassStmt(stmt: Stmt.Class): void {
         this.declare(stmt.name);
         this.define(stmt.name);
+
+        stmt.methods.forEach(method => {
+            const declaration = EFunctionType.METHOD;
+            this.resolveFunction(method, declaration);
+        })
     }
 
     public visitExpressionStmt(stmt: Stmt.Expression): void {

@@ -320,7 +320,14 @@ export class Interpreter implements Expr.Visitor<Nullable<Object>>, Stmt.Visitor
 
     public visitClassStmt(stmt: Stmt.Class): void {
         this.environment.define(stmt.name.lexeme, null);
-        const klass: LoxClass = new LoxClass(stmt.name.lexeme);
+
+        const methods: Map<string, LoxFunction> = new Map();
+        stmt.methods.forEach(method => {
+            const func: LoxFunction = new LoxFunction(method, this.environment);
+            methods.set(method.name.lexeme, func);
+        })
+        
+        const klass: LoxClass = new LoxClass(stmt.name.lexeme, methods);
         this.environment.assign(stmt.name, klass);
     }
 

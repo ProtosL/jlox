@@ -1,6 +1,14 @@
-class Bagel {}
-Bagel();
-print Bagel;
+class Bacon {
+    eat() {
+    print "Crunch crunch crunch!";
+    }
+}
+
+Bacon().eat();
+
+// class Bagel {}
+// Bagel();
+// print Bagel;
 
 // 12.2
 // class DevonshireCream {
