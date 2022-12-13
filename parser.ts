@@ -48,7 +48,7 @@
  * # 一元表达式可以嵌套，形如 !!
  * unary          → ( "!" | "-" ) unary
  *                | call ;
- * call           → primary ( "(" arguments? ")" )* ;
+ * call           → primary ( "(" arguments? ")" | "." IDENTIFIER )* ;
  * arguments      → expression ( "," expression )* ;
  * primary        → NUMBER | STRING 
  *                | "true" | "false" | "nil"
