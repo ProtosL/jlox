@@ -4,9 +4,18 @@ import { Interpreter } from './interpreter';
 import { Token } from './token';
 import { Lox } from './lox';
 
+enum EFunctionType {
+    NONE,
+    FUNCTION
+}
+
 export class Resolver implements Expr.Visitor<void>, Stmt.Visitor<void> {
     private readonly interpreter: Interpreter;
     private readonly scopes: Map<string, boolean>[] = [];
+    /**
+     * 当前访问的代码是否在函数声明中
+     */
+    private currentFunction: EFunctionType = EFunctionType.NONE;
 
     constructor(interpreter: Interpreter) {
         this.interpreter = interpreter;
@@ -26,7 +35,7 @@ export class Resolver implements Expr.Visitor<void>, Stmt.Visitor<void> {
         this.declare(stmt.name);
         this.define(stmt.name);
 
-        this.resolveFunction(stmt);
+        this.resolveFunction(stmt, EFunctionType.FUNCTION);
     }
 
     public visitIfStmt(stmt: Stmt.If): void {
@@ -43,6 +52,10 @@ export class Resolver implements Expr.Visitor<void>, Stmt.Visitor<void> {
     }
 
     public visitReturnStmt(stmt: Stmt.Return): void {
+        if (this.currentFunction === EFunctionType.NONE) {
+            Lox.error(stmt.keyword, "Can't return from top-level code.");
+        }        
+        
         if (stmt.value !== null) {
             this.resolveExpr(stmt.value);
         }
@@ -119,7 +132,10 @@ export class Resolver implements Expr.Visitor<void>, Stmt.Visitor<void> {
         expr.accept(this);
     }
 
-    private resolveFunction(func: Stmt.Function) {
+    private resolveFunction(func: Stmt.Function, type: EFunctionType) {
+        const enclosingFunction: EFunctionType = this.currentFunction;
+        this.currentFunction = type;
+        
         this.beginScope();
         func.params.forEach((param: Token) => {
             this.declare(param);
@@ -127,6 +143,7 @@ export class Resolver implements Expr.Visitor<void>, Stmt.Visitor<void> {
         })
         this.resolveStatements(func.body);
         this.endScope();
+        this.currentFunction = enclosingFunction;
     }
 
     private beginScope(): void {
@@ -147,7 +164,7 @@ export class Resolver implements Expr.Visitor<void>, Stmt.Visitor<void> {
         if (scope.get(name.lexeme)) {
             Lox.error(name, "Already a variable with this name in this scope.");
         }
-        
+
         // 设置为 false，表示该变量还未准备好
         scope.set(name.lexeme, false);
     }

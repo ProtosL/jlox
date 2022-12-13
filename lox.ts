@@ -68,6 +68,10 @@ export class Lox {
         const resolver: Resolver = new Resolver(this.interpreter);
         resolver.resolveStatements(statements);
 
+        if (this.hasError) {
+            return;
+        }
+        
         this.interpreter.interpret(statements);
     }
 
