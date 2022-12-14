@@ -13,7 +13,8 @@ enum EFunctionType {
 
 enum EClassType {
     NONE,
-    CLASS
+    CLASS,
+    SUBCLASS
 }
 
 export class Resolver implements Expr.Visitor<void>, Stmt.Visitor<void> {
@@ -48,6 +49,7 @@ export class Resolver implements Expr.Visitor<void>, Stmt.Visitor<void> {
         } 
 
         if (stmt.superclass !== null) {
+            this.currentClass = EClassType.SUBCLASS;
             this.resolveExpr(stmt.superclass);
         }
 
@@ -156,6 +158,12 @@ export class Resolver implements Expr.Visitor<void>, Stmt.Visitor<void> {
     }
 
     public visitSuperExpr(expr: Expr.Super): void {
+        if (this.currentClass === EClassType.NONE) {
+            Lox.error(expr.keyword, "Can't use 'super' outside of a class.");
+        } else if (this.currentClass !== EClassType.SUBCLASS) {
+            Lox.error(expr.keyword, "Can't use 'super' in a class with no superclass.");
+        }
+        
         this.resolveLocal(expr, expr.keyword);
     }
 

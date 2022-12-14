@@ -1,17 +1,25 @@
-class Doughnut {
-  cook() {
-    print "Fry until golden brown.";
-  }
-}
-
-class BostonCream < Doughnut {
+class Eclair {
   cook() {
     super.cook();
-    print "Pipe full of custard and coat with chocolate.";
+    print "Pipe full of crème pâtissière.";
   }
 }
 
-BostonCream().cook();
+// 13.3.2
+// class Doughnut {
+//   cook() {
+//     print "Fry until golden brown.";
+//   }
+// }
+
+// class BostonCream < Doughnut {
+//   cook() {
+//     super.cook();
+//     print "Pipe full of custard and coat with chocolate.";
+//   }
+// }
+
+// BostonCream().cook();
 
 
 // 13.2
