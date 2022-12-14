@@ -71,6 +71,21 @@ export class Interpreter implements Expr.Visitor<Nullable<Object>>, Stmt.Visitor
         return value;
     }
 
+    public visitSuperExpr(expr: Expr.Super): Nullable<Object> {
+        const distance: number = this.locals.get(expr) ?? 1;
+        const superclass: LoxClass = this.environment.getAt(distance, "super") as LoxClass;
+
+        const object: LoxInstance = this.environment.getAt(distance - 1, "this") as LoxInstance;
+
+        const method: Nullable<LoxFunction> = superclass.findMethod(expr.method.lexeme);
+
+        if (method === null) {
+            throw new RuntimeError(expr.method, `Undefined property '${expr.method.lexeme}'.`)
+        }
+        
+        return method.bind(object);
+    }
+
     public visitThisExpr(expr: Expr.This): Nullable<Object> {
         return this.lookUpVariable(expr.keyword, expr);
     }
@@ -333,6 +348,11 @@ export class Interpreter implements Expr.Visitor<Nullable<Object>>, Stmt.Visitor
         
         this.environment.define(stmt.name.lexeme, null);
 
+        if (stmt.superclass !== null) {
+            this.environment = new Environment(this.environment);
+            this.environment.define("super", superclass);
+        }
+
         const methods: Map<string, LoxFunction> = new Map();
         stmt.methods.forEach(method => {
             const func: LoxFunction = new LoxFunction(method, this.environment, method.name.lexeme === "init");
@@ -340,6 +360,11 @@ export class Interpreter implements Expr.Visitor<Nullable<Object>>, Stmt.Visitor
         })
 
         const klass: LoxClass = new LoxClass(stmt.name.lexeme, superclass, methods);
+
+        if (superclass !== null) {
+            this.environment = this.environment.enclosing!;
+        }
+        
         this.environment.assign(stmt.name, klass);
     }
 

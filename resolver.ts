@@ -51,6 +51,11 @@ export class Resolver implements Expr.Visitor<void>, Stmt.Visitor<void> {
             this.resolveExpr(stmt.superclass);
         }
 
+        if (stmt.superclass !== null) {
+            this.beginScope();
+            this.peekScopes().set("super", true);
+        }
+
         this.beginScope();
         this.peekScopes().set("this", true);
         
@@ -65,6 +70,10 @@ export class Resolver implements Expr.Visitor<void>, Stmt.Visitor<void> {
 
         this.endScope();
 
+        if (stmt.superclass !== null) {
+            this.endScope();
+        }
+        
         this.currentClass = enclosingClass;
     }
 
@@ -144,6 +153,10 @@ export class Resolver implements Expr.Visitor<void>, Stmt.Visitor<void> {
     public visitSetExpr(expr: Expr.Set): void {
         this.resolveExpr(expr.value);
         this.resolveExpr(expr.object);
+    }
+
+    public visitSuperExpr(expr: Expr.Super): void {
+        this.resolveLocal(expr, expr.keyword);
     }
 
     public visitThisExpr(expr: Expr.This): void {

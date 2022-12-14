@@ -57,8 +57,8 @@ export class Environment {
         return environment;
     }
     
-    getAt(distance: number, name: string): Nullable<Object> {
-        return this.ancestor(distance).values.get(name) || null;
+    getAt<T>(distance: number, name: string): Nullable<Object> {
+        return this.ancestor(distance).values.get(name) ?? null;
     }
 
     assignAt(distance: number, name: Token, value: Nullable<Object>) {
