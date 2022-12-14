@@ -20,6 +20,11 @@ export class LoxClass implements LoxCallable {
             return this.methods.get(name) ?? null;
         }
 
+        // 在该实例中未找到该方法时向上查找
+        if (this.superclass !== null) {
+            return this.superclass.findMethod(name);
+        }
+
         return null;
     }
 
