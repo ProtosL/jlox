@@ -6,7 +6,7 @@
  *                | varDecl
  *                | statement ;
  * 
- * classDecl      → "class" IDENTIFIER "{" function* "}" ;
+ * classDecl      → "class" IDENTIFIER ( "<" IDENTIFIER )? "{" function* "}" ;
  * 
  * funDecl        → "fun" function ;
  * function       → IDENTIFIER "(" parameters? ")" block ;
@@ -127,6 +127,13 @@ export class Parser {
      */
     private classDeclaration(): Stmt.Stmt {
         const name: Token = this.consume(TokenType.IDENTIFIER, "Expect class name");
+
+        let superclass: Nullable<Expr.Variable> = null;
+        if (this.match(TokenType.LESS)) {
+            this.consume(TokenType.IDENTIFIER, "Expect superclass name.");
+            superclass = new Expr.Variable(this.previous());
+        }
+        
         this.consume(TokenType.LEFT_BRACE, "Expect '{' before class body.");
 
         const methods: Stmt.Function[] = [];
@@ -136,7 +143,7 @@ export class Parser {
 
         this.consume(TokenType.RIGHT_BRACE, "Expect '}' after class body.");
 
-        return new Stmt.Class(name, methods);
+        return new Stmt.Class(name, superclass, methods);
     }
 
     /**

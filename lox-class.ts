@@ -6,10 +6,12 @@ import { LoxFunction } from './lox-function';
 
 export class LoxClass implements LoxCallable {
     readonly name: string;
+    readonly superclass: Nullable<LoxClass>;
     private readonly methods: Map<string, LoxFunction>;
 
-    constructor(name: string, methods: Map<string, LoxFunction>) {
+    constructor(name: string, superclass: Nullable<LoxClass>, methods: Map<string, LoxFunction>) {
         this.name = name;
+        this.superclass = superclass;
         this.methods = methods;
     }
 

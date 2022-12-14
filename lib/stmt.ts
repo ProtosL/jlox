@@ -34,11 +34,13 @@ export namespace Stmt {
 
     export class Class extends Stmt {
         readonly name: Token;
+        readonly superclass: Nullable<Expr.Variable>;
         readonly methods: Stmt.Function[];
 
-        constructor(name: Token, methods: Stmt.Function[]) {
+        constructor(name: Token, superclass: Nullable<Expr.Variable>, methods: Stmt.Function[]) {
             super();
             this.name = name;
+            this.superclass = superclass;
             this.methods = methods;
         }
 

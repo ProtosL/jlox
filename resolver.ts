@@ -42,6 +42,15 @@ export class Resolver implements Expr.Visitor<void>, Stmt.Visitor<void> {
         this.declare(stmt.name);
         this.define(stmt.name);
 
+        // 避免 class Oops < Oops {} 这种继承自己的情况
+        if (stmt.superclass !== null && stmt.name.lexeme === stmt.superclass.name.lexeme) {
+            Lox.error(stmt.superclass.name, "A class can't inherit from itself.");
+        } 
+
+        if (stmt.superclass !== null) {
+            this.resolveExpr(stmt.superclass);
+        }
+
         this.beginScope();
         this.peekScopes().set("this", true);
         
