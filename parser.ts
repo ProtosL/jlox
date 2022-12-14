@@ -50,10 +50,9 @@
  *                | call ;
  * call           → primary ( "(" arguments? ")" | "." IDENTIFIER )* ;
  * arguments      → expression ( "," expression )* ;
- * primary        → NUMBER | STRING 
- *                | "true" | "false" | "nil"
- *                | "(" expression ")" 
- *                | IDENTIFIER ;
+ * primary        → "true" | "false" | "nil" | "this"
+ *                | NUMBER | STRING | IDENTIFIER | "(" expression ")"
+ *                | "super" "." IDENTIFIER ;
  */
 import { Token } from './token';
 import { Expr } from './lib/expr';
@@ -505,8 +504,9 @@ export class Parser {
     }
 
     /**
-     * primary        → NUMBER | STRING | "true" | "false" | "nil"
-     *                | "(" expression ")" ;
+     * primary        → "true" | "false" | "nil" | "this"
+     *                | NUMBER | STRING | IDENTIFIER | "(" expression ")"
+     *                | "super" "." IDENTIFIER ;
      */
     private primary(): Expr.Expr {
         if (this.match(TokenType.FALSE)) {
@@ -521,6 +521,13 @@ export class Parser {
 
         if (this.match(TokenType.NUMBER, TokenType.STRING)) {
             return new Expr.Literal(this.previous().literal);
+        }
+
+        if (this.match(TokenType.SUPER)) {
+            const keyword: Token = this.previous();
+            this.consume(TokenType.DOT, "Expect '.' after 'super'.");
+            const method: Token = this.consume(TokenType.IDENTIFIER, "Expect superclass method name.");
+            return new Expr.Super(keyword, method);
         }
 
         if (this.match(TokenType.THIS)) {
