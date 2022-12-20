@@ -4,7 +4,6 @@ import { Scanner } from './scanner';
 import { TokenType } from './token-type';
 import { Token } from './token';
 import { Parser } from './parser';
-import { AstPrinter } from './ast-printer';
 import { Interpreter } from './interpreter';
 import { Resolver } from './resolver';
 
@@ -101,4 +100,3 @@ export class Lox {
         }
     }
 }
-Lox.main([`./test/test13`]);

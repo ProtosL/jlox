@@ -91,7 +91,7 @@ export class Resolver implements Expr.Visitor<void>, Stmt.Visitor<void> {
     }
 
     public visitIfStmt(stmt: Stmt.If): void {
-        this.resolveStatement(stmt);
+        this.resolveExpr(stmt.condition);
         this.resolveStatement(stmt.thenBranch);
         // 不管条件，有就解析
         if (stmt.elseBranch !== null) {

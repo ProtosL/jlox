@@ -1,15 +1,24 @@
 {
     "name": "jlox",
-    "version": "1.0.0",
+    "version": "1.0.3",
     "description": "",
     "main": "lox.ts",
+    "bin": {
+        "jlox": "./dist/index.js"
+    },
     "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1"
+        "build": "tsc",
+        "start": "tsc --watch"
     },
     "keywords": [],
     "author": "",
     "license": "ISC",
     "dependencies": {
-        "@types/node": "^18.6.3"
-    }
+        "@types/node": "^18.6.3",
+        "@types/yargs": "^17.0.17",
+        "chalk": "4",
+        "typescript": "^4.9.4",
+        "yargs": "^17.6.2"
+    },
+    "perferGlobal": true
 }
